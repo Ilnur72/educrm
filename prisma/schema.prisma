@@ -1,0 +1,295 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── FOYDALANUVCHILAR ───────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(RECEPTION)
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  oqituvchi Oqituvchi?
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  OQITUVCHI
+  RECEPTION
+}
+
+// ─── LIDLAR ────────────────────────────────────────────────────────────────
+
+model Lid {
+  id              String    @id @default(cuid())
+  ism             String
+  telefon         String
+  qoshimcha       String?
+  kurs            String
+  manba           LidManba  @default(BOSHQA)
+  holat           LidHolat  @default(YANGI)
+  izoh            String?
+  keyingiQongiroq DateTime?
+  sinovSanasi     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  talabaId        String?   @unique
+  talaba          Talaba?   @relation(fields: [talabaId], references: [id])
+
+  @@map("lidlar")
+}
+
+enum LidManba {
+  INSTAGRAM
+  TELEGRAM
+  GOOGLE
+  DOST_TAVSIYASI
+  BOSHQA
+}
+
+enum LidHolat {
+  YANGI
+  QONGIROQ_QILINDI
+  SINOV_DARSI
+  YOZILDI
+  RAD_ETDI
+}
+
+// ─── KURSLAR & GURUHLAR ────────────────────────────────────────────────────
+
+model Kurs {
+  id          String   @id @default(cuid())
+  nom         String
+  tavsif      String?
+  davomiyligi Int
+  narxi       Int
+  maxTalaba   Int      @default(12)
+  faol        Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  guruhlar Guruh[]
+
+  @@map("kurslar")
+}
+
+model Guruh {
+  id          String     @id @default(cuid())
+  nom         String
+  kursId      String
+  kurs        Kurs       @relation(fields: [kursId], references: [id])
+  oqituvchiId String?
+  oqituvchi   Oqituvchi? @relation(fields: [oqituvchiId], references: [id])
+  xona        String?
+  kunlar      String[]
+  vaqt        String
+  boshlanish  DateTime
+  tugash      DateTime?
+  faol        Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  talabalar  TalabaGuruh[]
+  davomatlar Davomat[]
+  darslar    Dars[]
+
+  @@map("guruhlar")
+}
+
+// ─── O'QITUVCHILAR ─────────────────────────────────────────────────────────
+
+model Oqituvchi {
+  id            String      @id @default(cuid())
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id])
+  telefon       String?
+  mutaxassislik String[]
+  ishHaqiTuri   IshHaqiTuri @default(FOIZ)
+  foiz          Float?
+  soatlik       Int?
+  faol          Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  guruhlar  Guruh[]
+  ishHaqlar IshHaq[]
+
+  @@map("oqituvchilar")
+}
+
+enum IshHaqiTuri {
+  FOIZ
+  SOATLIK
+  OYLIK
+}
+
+// ─── TALABALAR ─────────────────────────────────────────────────────────────
+
+model Talaba {
+  id              String    @id @default(cuid())
+  ism             String
+  familiya        String
+  telefon         String
+  otaTelefon      String?
+  otaTelegramId   String?   // Ota-onaning Telegram chat ID
+  email           String?
+  tugilganKun     DateTime?
+  manzil          String?
+  izoh            String?
+  faol            Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  guruhlar   TalabaGuruh[]
+  tolovlar   Tolov[]
+  davomatlar Davomat[]
+  lid        Lid?
+
+  @@map("talabalar")
+}
+
+model TalabaGuruh {
+  id          String    @id @default(cuid())
+  talabaId    String
+  talaba      Talaba    @relation(fields: [talabaId], references: [id])
+  guruhId     String
+  guruh       Guruh     @relation(fields: [guruhId], references: [id])
+  kirishSana  DateTime  @default(now())
+  chiqishSana DateTime?
+  faol        Boolean   @default(true)
+
+  @@unique([talabaId, guruhId])
+  @@map("talaba_guruh")
+}
+
+// ─── DAVOMAT ────────────────────────────────────────────────────────────────
+
+model Dars {
+  id        String   @id @default(cuid())
+  guruhId   String
+  guruh     Guruh    @relation(fields: [guruhId], references: [id])
+  sana      DateTime
+  mavzu     String?
+  izoh      String?
+  createdAt DateTime @default(now())
+
+  davomatlar Davomat[]
+
+  @@map("darslar")
+}
+
+model Davomat {
+  id       String       @id @default(cuid())
+  talabaId String
+  talaba   Talaba       @relation(fields: [talabaId], references: [id])
+  guruhId  String
+  guruh    Guruh        @relation(fields: [guruhId], references: [id])
+  darsId   String
+  dars     Dars         @relation(fields: [darsId], references: [id])
+  holat    DavomatHolat @default(KELDI)
+  izoh     String?
+  createdAt DateTime    @default(now())
+
+  @@unique([talabaId, darsId])
+  @@map("davomatlar")
+}
+
+enum DavomatHolat {
+  KELDI
+  KELMADI
+  KECH_KELDI
+  SABABLI
+}
+
+// ─── TO'LOVLAR ─────────────────────────────────────────────────────────────
+
+model Tolov {
+  id         String   @id @default(cuid())
+  talabaId   String
+  talaba     Talaba   @relation(fields: [talabaId], references: [id])
+  summa      Int
+  tur        TolovTur @default(NAQD)
+  oy         Int
+  yil        Int
+  izoh       String?
+  qabulQildi String?
+  createdAt  DateTime @default(now())
+
+  @@map("tolovlar")
+}
+
+enum TolovTur {
+  NAQD
+  KARTA
+  CLICK
+  PAYME
+}
+
+// ─── ISH HAQI ──────────────────────────────────────────────────────────────
+
+model IshHaq {
+  id          String    @id @default(cuid())
+  oqituvchiId String
+  oqituvchi   Oqituvchi @relation(fields: [oqituvchiId], references: [id])
+  summa       Int
+  oy          Int
+  yil         Int
+  tolanganMi  Boolean   @default(false)
+  izoh        String?
+  createdAt   DateTime  @default(now())
+
+  @@map("ish_haqlar")
+}
+
+// ─── XONALAR ───────────────────────────────────────────────────────────────
+
+model Xona {
+  id        String   @id @default(cuid())
+  nom       String
+  sigim     Int?
+  izoh      String?
+  faol      Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("xonalar")
+}
+
+// ─── SMS XABARLAR ──────────────────────────────────────────────────────────
+
+model Xabar {
+  id        String     @id @default(cuid())
+  telefon   String
+  matn      String
+  holat     XabarHolat @default(KUTILMOQDA)
+  tur       XabarTur   @default(MANUAL)
+  createdAt DateTime   @default(now())
+
+  @@map("xabarlar")
+}
+
+enum XabarHolat {
+  KUTILMOQDA
+  YUBORILDI
+  XATO
+}
+
+enum XabarTur {
+  DAVOMAT
+  TOLOV
+  ESLATMA
+  MARKETING
+  MANUAL
+}

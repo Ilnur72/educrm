@@ -1,0 +1,23 @@
+{
+  "buildCommand": "prisma generate && next build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/tolov-eslatma",
+      "schedule": "0 9 1 * *"
+    },
+    {
+      "path": "/api/cron/xavf-tahlil",
+      "schedule": "0 20 * * *"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "NEXTAUTH_URL": "@nextauth_url",
+    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token",
+    "TELEGRAM_WEBHOOK_SECRET": "@telegram_webhook_secret",
+    "CRON_SECRET": "@cron_secret"
+  }
+}
