@@ -1,12 +1,28 @@
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const API   = `https://api.telegram.org/bot${TOKEN}`;
 
-export async function sendMessage(chatId: string | number, text: string) {
+type InlineButton = { text: string; callback_data: string };
+type InlineKeyboard = { inline_keyboard: InlineButton[][] };
+
+export async function sendMessage(
+  chatId: string | number,
+  text: string,
+  reply_markup?: InlineKeyboard
+) {
   if (!TOKEN) return;
   await fetch(`${API}/sendMessage`, {
     method:  "POST",
     headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+    body:    JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", reply_markup }),
+  }).catch(() => {});
+}
+
+export async function answerCallbackQuery(callbackQueryId: string, text?: string) {
+  if (!TOKEN) return;
+  await fetch(`${API}/answerCallbackQuery`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ callback_query_id: callbackQueryId, text }),
   }).catch(() => {});
 }
 
@@ -20,7 +36,7 @@ export async function setWebhook(url: string) {
   return res.json();
 }
 
-// ─── Tayyor xabar shablonlari ───────────────────────────────────────────────
+// ─── Xabar shablonlari ──────────────────────────────────────────────────────
 
 export function xabarKelmadi(ism: string, familiya: string, guruhNom: string, sana: string) {
   return (
@@ -46,6 +62,31 @@ export function xabarTolovEslatma(ism: string, familiya: string, summa: number, 
     `Hurmatli ota-ona!\n` +
     `<b>${ism} ${familiya}</b> uchun ${oy} oyiga ` +
     `<b>${summa.toLocaleString()} so'm</b> to'lov amalga oshirilmagan.\n\n` +
-    `Iltimos, o'quv markaziga murojaat qiling.`
+    `Iltimos, to'lovni amalga oshiring.`
+  );
+}
+
+export function xabarDarsBekor(guruhNom: string, sana: string, sabab?: string) {
+  return (
+    `❌ <b>Dars bekor qilindi</b>\n\n` +
+    `<b>${guruhNom}</b> guruhining ${sana} kungi darsi bekor qilindi.\n` +
+    (sabab ? `\n<b>Sabab:</b> ${sabab}` : "")
+  );
+}
+
+export function tolovQildiXabar(
+  talabaIsm: string,
+  talabaTelefon: string,
+  summa: number,
+  oy: number,
+  yil: number,
+) {
+  return (
+    `💰 <b>To'lov so'rovi</b>\n\n` +
+    `Talaba: <b>${talabaIsm}</b>\n` +
+    `Telefon: <code>${talabaTelefon}</code>\n` +
+    `Oy: <b>${oy}/${yil}</b>\n` +
+    `Summa: <b>${summa.toLocaleString()} so'm</b>\n\n` +
+    `Ota-ona to'lov qilganini tasdiqladi.`
   );
 }

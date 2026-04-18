@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/Card";
 import { Table, Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 import { formatSana, formatSum } from "@/lib/utils";
+import { Modal } from "@/components/ui/Modal";
+import { Input } from "@/components/ui/Input";
 
 type Talaba = {
   id: string;
@@ -68,6 +70,13 @@ export default function GuruhDetailPage() {
   const [guruh, setGuruh]           = useState<Guruh | null>(null);
   const [yuklanyapti, setYuklanyapti] = useState(true);
 
+  // Dars bekor qilish
+  const [bekorModal, setBekorModal]   = useState(false);
+  const [bekorSana, setBekorSana]     = useState(new Date().toISOString().slice(0, 10));
+  const [bekorSabab, setBekorSabab]   = useState("");
+  const [bekorYuborilmoqda, setBekorYuborilmoqda] = useState(false);
+  const [bekorNatija, setBekorNatija] = useState<{ jami: number; yuborildi: number } | null>(null);
+
   useEffect(() => {
     fetch(`/api/guruhlar/${id}`)
       .then((r) => r.json())
@@ -91,7 +100,14 @@ export default function GuruhDetailPage() {
     <div>
       <Topbar
         title={guruh.nom}
-        actions={<Button variant="ghost" onClick={() => router.back()}>← Orqaga</Button>}
+        actions={
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => { setBekorSana(new Date().toISOString().slice(0, 10)); setBekorSabab(""); setBekorNatija(null); setBekorModal(true); }}>
+              ❌ Dars bekor
+            </Button>
+            <Button variant="ghost" onClick={() => router.back()}>← Orqaga</Button>
+          </div>
+        }
       />
 
       <div className="p-6 space-y-5">
@@ -227,6 +243,69 @@ export default function GuruhDetailPage() {
           )}
         </Card>
       </div>
+
+      {/* Dars bekor qilish modali */}
+      <Modal open={bekorModal} onClose={() => setBekorModal(false)} title="Dars bekor qilish">
+        <div className="space-y-4">
+          {bekorNatija ? (
+            <div className="text-center py-4 space-y-3">
+              <p className="text-3xl">✅</p>
+              <p className="font-semibold text-gray-900">Xabarlar yuborildi</p>
+              <p className="text-sm text-gray-500">
+                {bekorNatija.yuborildi} ta ota-onaga Telegram xabari yuborildi
+                {bekorNatija.jami - bekorNatija.yuborildi > 0 && (
+                  <span className="text-amber-500">
+                    {" "}({bekorNatija.jami - bekorNatija.yuborildi} ta telegram ulanmagan)
+                  </span>
+                )}
+              </p>
+              <Button variant="primary" onClick={() => setBekorModal(false)}>Yopish</Button>
+            </div>
+          ) : (
+            <>
+              <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">
+                Barcha ota-onalarga Telegram orqali dars bekor qilinishi haqida xabar yuboriladi.
+              </div>
+              <Input
+                label="Dars sanasi *"
+                type="date"
+                value={bekorSana}
+                onChange={(e) => setBekorSana(e.target.value)}
+              />
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">Sabab (ixtiyoriy)</label>
+                <textarea
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  rows={2}
+                  placeholder="O'qituvchi kasalligi, bayram..."
+                  value={bekorSabab}
+                  onChange={(e) => setBekorSabab(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="ghost" onClick={() => setBekorModal(false)}>Bekor</Button>
+                <Button
+                  variant="primary"
+                  disabled={!bekorSana || bekorYuborilmoqda}
+                  onClick={async () => {
+                    setBekorYuborilmoqda(true);
+                    const res = await fetch(`/api/guruhlar/${id}/dars-bekor`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ sana: bekorSana, sabab: bekorSabab }),
+                    });
+                    const data = await res.json();
+                    setBekorNatija(data);
+                    setBekorYuborilmoqda(false);
+                  }}
+                >
+                  {bekorYuborilmoqda ? "Yuborilmoqda..." : "Xabar yuborish"}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
