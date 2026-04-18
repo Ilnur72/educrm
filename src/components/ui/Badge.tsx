@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Variant = "green" | "amber" | "red" | "blue" | "purple" | "gray";
+type Variant = "green" | "amber" | "red" | "blue" | "purple" | "gray" | "teal";
 
 const styles: Record<Variant, string> = {
   green:  "bg-green-50  text-green-800  border-green-200",
@@ -9,6 +9,7 @@ const styles: Record<Variant, string> = {
   blue:   "bg-blue-50   text-blue-800   border-blue-200",
   purple: "bg-purple-50 text-purple-800 border-purple-200",
   gray:   "bg-gray-100  text-gray-600   border-gray-200",
+  teal:   "bg-teal-50   text-teal-800   border-teal-200",
 };
 
 export function Badge({

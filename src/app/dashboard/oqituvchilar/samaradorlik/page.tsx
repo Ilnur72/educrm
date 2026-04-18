@@ -21,13 +21,7 @@ type OqituvchiStat = {
 
 function FoizBar({ foiz }: { foiz: number | null }) {
   if (foiz === null) return <span className="text-gray-300 text-xs">—</span>;
-  const colors = {
-    green: "bg-green-500",
-    amber: "bg-amber-400",
-    red:   "bg-red-400",
-    blue:  "bg-blue-500",
-  };
-  const color = foiz >= 80 ? colors.green : foiz >= 60 ? colors.amber : colors.red;
+  const color = foiz >= 80 ? "bg-green-500" : foiz >= 60 ? "bg-amber-400" : "bg-red-400";
   return (
     <div className="flex items-center gap-2 min-w-[100px]">
       <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
