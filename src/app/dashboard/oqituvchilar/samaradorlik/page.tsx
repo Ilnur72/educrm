@@ -143,8 +143,8 @@ export default function SamaradorlikPage() {
                       </Td>
                       <Td className="font-medium">{o.guruhSoni}</Td>
                       <Td className="font-medium">{o.jamiTalabalar}</Td>
-                      <Td><FoizBar foiz={o.davomatFoiz} rang="green" /></Td>
-                      <Td><FoizBar foiz={o.tolovFoiz} rang="blue" /></Td>
+                      <Td><FoizBar foiz={o.davomatFoiz} /></Td>
+                      <Td><FoizBar foiz={o.tolovFoiz} /></Td>
                       <Td>
                         <span className={`text-sm font-bold ${
                           ball(o) >= 75 ? "text-green-600" :
