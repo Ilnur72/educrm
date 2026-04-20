@@ -59,16 +59,19 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
     box-sizing: border-box;
   }
 
   html {
-    @apply scroll-smooth;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -91,18 +94,23 @@
 }
 
 /* Focus ring styles */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
 }
 
 /* Glass effect */
 .glass {
-  @apply bg-card/80 backdrop-blur-xl;
+  background-color: hsl(var(--card) / 0.8);
+  backdrop-filter: blur(24px);
 }
 
 /* Gradient text */
 .gradient-text {
-  @apply bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent;
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Animations */
@@ -135,10 +143,19 @@
 
 /* Card hover effects */
 .card-hover {
-  @apply transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20;
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  box-shadow: 0 10px 15px -3px hsl(var(--primary) / 0.05);
+  border-color: hsl(var(--primary) / 0.2);
 }
 
 /* Table row hover */
 .table-row-hover {
-  @apply transition-colors hover:bg-muted/50;
+  transition: background-color 0.15s ease;
+}
+
+.table-row-hover:hover {
+  background-color: hsl(var(--muted) / 0.5);
 }
