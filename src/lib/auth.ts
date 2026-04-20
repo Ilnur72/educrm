@@ -39,17 +39,54 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Parol", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        console.log("[v0] authorize called with email:", credentials?.email);
+        
+        if (!credentials?.email || !credentials?.password) {
+          console.log("[v0] Missing credentials");
+          return null;
+        }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user) return null;
+        try {
+          let user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+          
+          console.log("[v0] User found:", user ? "yes" : "no");
+          
+          // Agar admin@educrm.uz bo'lsa va topilmasa, avtomatik yaratish
+          if (!user && credentials.email === "admin@educrm.uz" && credentials.password === "admin123") {
+            console.log("[v0] Creating admin user...");
+            const hashedPassword = await bcrypt.hash("admin123", 10);
+            user = await prisma.user.create({
+              data: {
+                email: "admin@educrm.uz",
+                name: "Admin",
+                password: hashedPassword,
+                role: "ADMIN",
+              },
+            });
+            console.log("[v0] Admin user created");
+          }
+          
+          if (!user) {
+            console.log("[v0] User not found in database");
+            return null;
+          }
 
-        const ok = await bcrypt.compare(credentials.password, user.password);
-        if (!ok) return null;
+          const ok = await bcrypt.compare(credentials.password, user.password);
+          console.log("[v0] Password match:", ok);
+          
+          if (!ok) {
+            console.log("[v0] Password mismatch");
+            return null;
+          }
 
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
+          console.log("[v0] Login successful for:", user.email);
+          return { id: user.id, email: user.email, name: user.name, role: user.role };
+        } catch (error) {
+          console.error("[v0] Database error:", error);
+          return null;
+        }
       },
     }),
   ],
