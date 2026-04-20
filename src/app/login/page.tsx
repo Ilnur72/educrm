@@ -24,30 +24,16 @@ function LoginForm() {
 
     setYuklanyapti(false);
 
-    if (res?.error) {
+    console.log("[v0] signIn response:", res);
+
+    // NextAuth response tekshirish - ok: false yoki error mavjud bo'lsa xato
+    if (!res?.ok || res?.error) {
       setXato("Email yoki parol noto'g'ri");
       return;
     }
 
-    // CallbackUrl ni xavfsiz qilish - faqat local path qabul qilish
-    let callbackUrl = params.get("callbackUrl") ?? "/dashboard";
-    try {
-      const url = new URL(callbackUrl, window.location.origin);
-      // Faqat local URL larni qabul qilish
-      if (url.origin === window.location.origin) {
-        callbackUrl = url.pathname;
-      } else {
-        callbackUrl = "/dashboard";
-      }
-    } catch {
-      // Agar URL parse qilinmasa, default ga o'tish
-      if (!callbackUrl.startsWith("/")) {
-        callbackUrl = "/dashboard";
-      }
-    }
-    
-    router.push(callbackUrl);
-    router.refresh();
+    // Muvaffaqiyatli login - /dashboard ga o'tish
+    window.location.href = "/dashboard";
   };
 
   return (
