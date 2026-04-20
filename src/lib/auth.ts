@@ -39,52 +39,42 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Parol", type: "password" },
       },
       async authorize(credentials) {
-        console.log("[v0] authorize called with email:", credentials?.email);
-        
         if (!credentials?.email || !credentials?.password) {
-          console.log("[v0] Missing credentials");
           return null;
         }
 
+        // Demo foydalanuvchilar (database kerak emas)
+        const demoUsers = [
+          { id: "1", email: "admin@educrm.uz", password: "admin123", name: "Admin", role: "ADMIN" as Role },
+          { id: "2", email: "kamola@educrm.uz", password: "oqituvchi123", name: "Kamola", role: "TEACHER" as Role },
+        ];
+
+        const demoUser = demoUsers.find(
+          (u) => u.email === credentials.email && u.password === credentials.password
+        );
+
+        if (demoUser) {
+          return { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role };
+        }
+
+        // Database dan qidirish
         try {
-          let user = await prisma.user.findUnique({
+          const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
           
-          console.log("[v0] User found:", user ? "yes" : "no");
-          
-          // Agar admin@educrm.uz bo'lsa va topilmasa, avtomatik yaratish
-          if (!user && credentials.email === "admin@educrm.uz" && credentials.password === "admin123") {
-            console.log("[v0] Creating admin user...");
-            const hashedPassword = await bcrypt.hash("admin123", 10);
-            user = await prisma.user.create({
-              data: {
-                email: "admin@educrm.uz",
-                name: "Admin",
-                password: hashedPassword,
-                role: "ADMIN",
-              },
-            });
-            console.log("[v0] Admin user created");
-          }
-          
           if (!user) {
-            console.log("[v0] User not found in database");
             return null;
           }
 
           const ok = await bcrypt.compare(credentials.password, user.password);
-          console.log("[v0] Password match:", ok);
-          
           if (!ok) {
-            console.log("[v0] Password mismatch");
             return null;
           }
 
-          console.log("[v0] Login successful for:", user.email);
           return { id: user.id, email: user.email, name: user.name, role: user.role };
-        } catch (error) {
-          console.error("[v0] Database error:", error);
+        } catch {
+          // Database xatosi - faqat demo user lar ishlaydi
           return null;
         }
       },
