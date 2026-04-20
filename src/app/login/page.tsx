@@ -29,7 +29,23 @@ function LoginForm() {
       return;
     }
 
-    const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
+    // CallbackUrl ni xavfsiz qilish - faqat local path qabul qilish
+    let callbackUrl = params.get("callbackUrl") ?? "/dashboard";
+    try {
+      const url = new URL(callbackUrl, window.location.origin);
+      // Faqat local URL larni qabul qilish
+      if (url.origin === window.location.origin) {
+        callbackUrl = url.pathname;
+      } else {
+        callbackUrl = "/dashboard";
+      }
+    } catch {
+      // Agar URL parse qilinmasa, default ga o'tish
+      if (!callbackUrl.startsWith("/")) {
+        callbackUrl = "/dashboard";
+      }
+    }
+    
     router.push(callbackUrl);
     router.refresh();
   };
