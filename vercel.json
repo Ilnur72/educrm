@@ -11,15 +11,5 @@
       "path": "/api/cron/xavf-tahlil",
       "schedule": "0 20 * * *"
     }
-  ],
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "NEXTAUTH_SECRET": "@nextauth_secret",
-    "NEXTAUTH_URL": "@nextauth_url",
-    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token",
-    "TELEGRAM_WEBHOOK_SECRET": "@telegram_webhook_secret",
-    "TELEGRAM_ADMIN_CHAT_ID": "@telegram_admin_chat_id",
-    "NEXT_PUBLIC_TELEGRAM_BOT_USERNAME": "@next_public_telegram_bot_username",
-    "CRON_SECRET": "@cron_secret"
-  }
+  ]
 }
