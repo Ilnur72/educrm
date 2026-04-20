@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Type Check
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  typecheck:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,12 +28,3 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
-
-      - name: Deploy to Vercel
-        if: github.ref == 'refs/heads/main'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: --prod
