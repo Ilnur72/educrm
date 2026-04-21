@@ -5,8 +5,8 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: "/hisobotlar",         destination: "/dashboard/hisobotlar" },
-      { source: "/hisobotlar/:path*",  destination: "/dashboard/hisobotlar/:path*" },
+      { source: "/hisobotlar",          destination: "/dashboard/hisobotlar" },
+      { source: "/davomat-hisoboti",    destination: "/dashboard/hisobotlar/davomat" },
     ];
   },
 };

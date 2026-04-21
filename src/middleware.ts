@@ -7,7 +7,7 @@ export default withAuth(
     const path  = req.nextUrl.pathname;
 
     // Faqat ADMIN ko'rishi mumkin bo'lgan sahifalar
-    const adminOnly = ["/dashboard/oqituvchilar", "/dashboard/hisobotlar", "/hisobotlar"];
+    const adminOnly = ["/dashboard/oqituvchilar", "/dashboard/hisobotlar", "/hisobotlar", "/davomat-hisoboti"];
     if (adminOnly.some((p) => path.startsWith(p)) && token?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
@@ -30,5 +30,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/hisobotlar", "/hisobotlar/:path*"],
+  matcher: ["/dashboard/:path*", "/hisobotlar", "/davomat-hisoboti"],
 };
