@@ -39,44 +39,17 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Parol", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
-        // Demo foydalanuvchilar (database kerak emas)
-        const demoUsers = [
-          { id: "1", email: "admin@educrm.uz", password: "admin123", name: "Admin", role: "ADMIN" as Role },
-          { id: "2", email: "kamola@educrm.uz", password: "oqituvchi123", name: "Kamola", role: "TEACHER" as Role },
-        ];
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+        if (!user) return null;
 
-        const demoUser = demoUsers.find(
-          (u) => u.email === credentials.email && u.password === credentials.password
-        );
+        const ok = await bcrypt.compare(credentials.password, user.password);
+        if (!ok) return null;
 
-        if (demoUser) {
-          return { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role };
-        }
-
-        // Database dan qidirish
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-          
-          if (!user) {
-            return null;
-          }
-
-          const ok = await bcrypt.compare(credentials.password, user.password);
-          if (!ok) {
-            return null;
-          }
-
-          return { id: user.id, email: user.email, name: user.name, role: user.role };
-        } catch {
-          // Database xatosi - faqat demo user lar ishlaydi
-          return null;
-        }
+        return { id: user.id, email: user.email, name: user.name, role: user.role };
       },
     }),
   ],

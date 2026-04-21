@@ -16,42 +16,22 @@ function LoginForm() {
     setXato("");
     setYuklanyapti(true);
 
-    console.log("[v0] Login boshlandi, email:", email);
+    const res = await signIn("credentials", {
+      email,
+      password: parol,
+      redirect: false,
+    });
 
-    try {
-      const res = await signIn("credentials", {
-        email,
-        password: parol,
-        redirect: false,
-      });
+    setYuklanyapti(false);
 
-      console.log("[v0] signIn response:", JSON.stringify(res, null, 2));
-
-      setYuklanyapti(false);
-
-      // NextAuth response tekshirish
-      if (!res) {
-        console.log("[v0] Response null/undefined");
-        setXato("Server xatosi yuz berdi");
-        return;
-      }
-
-      if (res.error) {
-        console.log("[v0] Error:", res.error);
-        setXato("Email yoki parol noto'g'ri");
-        return;
-      }
-
-      if (res.ok) {
-        console.log("[v0] Login muvaffaqiyatli, redirect qilinmoqda...");
-        // Muvaffaqiyatli login - /dashboard ga o'tish
-        window.location.href = "/dashboard";
-      }
-    } catch (err) {
-      console.error("[v0] signIn xatosi:", err);
-      setYuklanyapti(false);
-      setXato("Tarmoq xatosi yuz berdi");
+    if (res?.error) {
+      setXato("Email yoki parol noto'g'ri");
+      return;
     }
+
+    const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
+    router.push(callbackUrl);
+    router.refresh();
   };
 
   return (
