@@ -117,9 +117,9 @@ export default function XonalarPage() {
             <Tbody>
               {xonalar.map((x) => (
                 <Tr key={x.id}>
-                  <Td className="font-medium">{x.nom}</Td>
-                  <Td>{x.sigim ? `${x.sigim} kishi` : "—"}</Td>
-                  <Td className="text-gray-400">{x.izoh ?? "—"}</Td>
+                  <Td className="font-medium text-foreground">{x.nom}</Td>
+                  <Td>{x.sigim ? <span className="bg-muted px-2 py-1 rounded-lg text-sm">{x.sigim} kishi</span> : <span className="text-muted-foreground/50">—</span>}</Td>
+                  <Td className="text-muted-foreground">{x.izoh ?? <span className="text-muted-foreground/50">—</span>}</Td>
                   <Td>
                     <button onClick={() => faolToggle(x)}>
                       <Badge variant={x.faol ? "green" : "gray"}>
@@ -141,8 +141,15 @@ export default function XonalarPage() {
               ))}
               {xonalar.length === 0 && (
                 <Tr>
-                  <Td colSpan={5} className="text-center text-gray-400 py-10">
-                    Xona qo'shilmagan
+                  <Td colSpan={5} className="text-center py-12">
+                    <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                      </svg>
+                    </div>
+                    <p className="text-muted-foreground">Xona qo'shilmagan</p>
+                    <p className="text-sm text-muted-foreground/60 mt-1">Birinchi xonani qo'shish uchun yuqoridagi tugmani bosing</p>
                   </Td>
                 </Tr>
               )}

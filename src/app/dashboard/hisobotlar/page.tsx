@@ -72,9 +72,9 @@ export default function HisobotlarPage() {
           actions={
             <button
               onClick={print}
-              className="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-600 transition-colors"
+              className="px-5 py-2.5 text-sm font-semibold bg-card border-2 border-border rounded-xl hover:border-primary/40 hover:text-primary transition-all duration-200 shadow-soft"
             >
-              PDF chiqarish ↓
+              PDF chiqarish
             </button>
           }
         />
@@ -90,11 +90,11 @@ export default function HisobotlarPage() {
         </div>
 
         {/* Oy/yil tanlash */}
-        <div className="flex items-center gap-3 no-print">
+        <div className="flex items-center gap-3 flex-wrap no-print">
           <select
             value={oy}
             onChange={(e) => setOy(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{oyNomi(i + 1)}</option>
@@ -103,15 +103,15 @@ export default function HisobotlarPage() {
           <select
             value={yil}
             onChange={(e) => setYil(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {[2024, 2025, 2026].map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
-          <span className="text-sm text-gray-500 font-medium">
-            {oyNomi(oy)} {yil} hisoboti
-          </span>
+          <div className="px-4 py-2 bg-primary/10 rounded-xl">
+            <span className="text-sm font-medium text-primary">{oyNomi(oy)} {yil} hisoboti</span>
+          </div>
         </div>
 
         {yukl ? (
@@ -122,40 +122,32 @@ export default function HisobotlarPage() {
           <>
             {/* Asosiy ko'rsatkichlar */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardBody>
-                  <p className="text-xs text-gray-500">Jami tushum</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{formatSum(data.jamilTushum)}</p>
-                  <p className="text-xs text-gray-400 mt-1">{data.tolovSoni} ta to'lov</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody>
-                  <p className="text-xs text-gray-500">Yangi talabalar</p>
-                  <p className="text-2xl font-bold text-green-600 mt-1">+{data.yangiTalabalar}</p>
-                  <p className="text-xs text-red-400 mt-1">−{data.chiqibKetganlar} chiqib ketdi</p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody>
-                  <p className="text-xs text-gray-500">Lid → Talaba</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{data.konversiya}%</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {data.yozilganLidlar}/{data.yangiLidlar} lid
-                  </p>
-                </CardBody>
-              </Card>
-              <Card>
-                <CardBody>
-                  <p className="text-xs text-gray-500">Davomat</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    {data.davomatFoiz !== null ? `${data.davomatFoiz}%` : "—"}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {data.davomatKeldi}/{data.davomatJami} dars
-                  </p>
-                </CardBody>
-              </Card>
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-soft">
+                <p className="text-sm font-medium text-muted-foreground">Jami tushum</p>
+                <p className="text-2xl font-bold text-foreground mt-2">{formatSum(data.jamilTushum)}</p>
+                <p className="text-sm text-muted-foreground mt-1">{data.tolovSoni} ta to'lov</p>
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-5 shadow-soft">
+                <p className="text-sm font-medium text-emerald-600">Yangi talabalar</p>
+                <p className="text-2xl font-bold text-emerald-700 mt-2">+{data.yangiTalabalar}</p>
+                <p className="text-sm text-red-500 mt-1">−{data.chiqibKetganlar} chiqib ketdi</p>
+              </div>
+              <div className="bg-violet-50 border border-violet-200/60 rounded-2xl p-5 shadow-soft">
+                <p className="text-sm font-medium text-violet-600">Lid → Talaba</p>
+                <p className="text-2xl font-bold text-violet-700 mt-2">{data.konversiya}%</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {data.yozilganLidlar}/{data.yangiLidlar} lid
+                </p>
+              </div>
+              <div className="bg-blue-50 border border-blue-200/60 rounded-2xl p-5 shadow-soft">
+                <p className="text-sm font-medium text-blue-600">Davomat</p>
+                <p className="text-2xl font-bold text-blue-700 mt-2">
+                  {data.davomatFoiz !== null ? `${data.davomatFoiz}%` : "—"}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {data.davomatKeldi}/{data.davomatJami} dars
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -173,14 +165,14 @@ export default function HisobotlarPage() {
                           ? Math.round((summa / data.jamilTushum) * 100) : 0;
                         return (
                           <div key={tur}>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="font-medium">{TOLOV_TUR_LABEL[tur] ?? tur}</span>
-                              <span className="text-gray-500">
+                            <div className="flex justify-between text-sm mb-2">
+                              <span className="font-medium text-foreground">{TOLOV_TUR_LABEL[tur] ?? tur}</span>
+                              <span className="text-muted-foreground">
                                 {formatSum(summa)} ({foiz}%)
                               </span>
                             </div>
-                            <div className="h-1.5 bg-gray-100 rounded-full">
-                              <div className="h-full bg-brand-500 rounded-full" style={{ width: `${foiz}%` }} />
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${foiz}%` }} />
                             </div>
                           </div>
                         );
@@ -203,12 +195,12 @@ export default function HisobotlarPage() {
                       const foiz = jamilLid > 0 ? Math.round((m._count / jamilLid) * 100) : 0;
                       return (
                         <div key={m.manba}>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>{MANBA_LABEL[m.manba] ?? m.manba}</span>
-                            <span className="text-gray-500">{m._count} ({foiz}%)</span>
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-foreground">{MANBA_LABEL[m.manba] ?? m.manba}</span>
+                            <span className="text-muted-foreground">{m._count} ({foiz}%)</span>
                           </div>
-                          <div className="h-1.5 bg-gray-100 rounded-full">
-                            <div className="h-full bg-brand-600 rounded-full" style={{ width: `${foiz}%` }} />
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-violet-500 rounded-full transition-all duration-300" style={{ width: `${foiz}%` }} />
                           </div>
                         </div>
                       );
@@ -233,11 +225,18 @@ export default function HisobotlarPage() {
                   <Tbody>
                     {data.topTolovchilar.map((t, i) => (
                       <Tr key={i}>
-                        <Td className="text-gray-400 text-xs">
-                          {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                        <Td>
+                          <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
+                            i === 0 ? "bg-amber-100 text-amber-700" :
+                            i === 1 ? "bg-slate-100 text-slate-700" :
+                            i === 2 ? "bg-orange-100 text-orange-700" :
+                            "bg-muted text-muted-foreground"
+                          }`}>
+                            {i + 1}
+                          </span>
                         </Td>
-                        <Td className="font-medium">{t.ism}</Td>
-                        <Td className="font-semibold text-green-700">{formatSum(t.summa)}</Td>
+                        <Td className="font-medium text-foreground">{t.ism}</Td>
+                        <Td className="font-bold text-emerald-600">{formatSum(t.summa)}</Td>
                       </Tr>
                     ))}
                   </Tbody>
@@ -269,28 +268,28 @@ export default function HisobotlarPage() {
                       const foiz = Math.round((g.talabaSoni / g.maxTalaba) * 100);
                       return (
                         <Tr key={g.id}>
-                          <Td className="font-medium">{g.nom}</Td>
-                          <Td className="text-gray-500">{g.kursNom}</Td>
-                          <Td className="text-gray-500">{g.oqituvchi ?? "—"}</Td>
+                          <Td className="font-medium text-foreground">{g.nom}</Td>
+                          <Td className="text-muted-foreground">{g.kursNom}</Td>
+                          <Td className="text-muted-foreground">{g.oqituvchi ?? <span className="text-muted-foreground/50">—</span>}</Td>
                           <Td>
-                            <span className="font-medium">{g.talabaSoni}</span>
-                            <span className="text-gray-400 text-xs">/{g.maxTalaba}</span>
+                            <span className="font-semibold text-foreground">{g.talabaSoni}</span>
+                            <span className="text-muted-foreground text-sm">/{g.maxTalaba}</span>
                           </Td>
                           <Td>
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 h-1.5 bg-gray-100 rounded-full">
+                            <div className="flex items-center gap-3">
+                              <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                                 <div
-                                  className={`h-full rounded-full ${
+                                  className={`h-full rounded-full transition-all duration-300 ${
                                     foiz >= 100 ? "bg-red-400" :
-                                    foiz >= 80  ? "bg-amber-400" : "bg-green-400"
+                                    foiz >= 80  ? "bg-amber-400" : "bg-emerald-400"
                                   }`}
                                   style={{ width: `${Math.min(foiz, 100)}%` }}
                                 />
                               </div>
-                              <span className="text-xs text-gray-500">{foiz}%</span>
+                              <span className="text-xs font-medium text-foreground">{foiz}%</span>
                             </div>
                           </Td>
-                          <Td className="font-medium text-green-700">
+                          <Td className="font-bold text-emerald-600">
                             {formatSum(g.oylikTushum)}
                           </Td>
                         </Tr>

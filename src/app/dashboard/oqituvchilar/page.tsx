@@ -161,20 +161,20 @@ export default function OqituvchilarPage() {
         actions={
           <Link
             href="/dashboard/oqituvchilar/samaradorlik"
-            className="px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-600 transition-colors"
+            className="px-5 py-2.5 text-sm font-semibold bg-card border-2 border-border rounded-xl hover:border-primary/40 hover:text-primary transition-all duration-200 shadow-soft"
           >
-            Samaradorlik hisoboti →
+            Samaradorlik hisoboti
           </Link>
         }
       />
 
       <div className="p-6 space-y-5">
         {/* Oy tanlash */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <select
             value={oy}
             onChange={(e) => setOy(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{oyNomi(i + 1)}</option>
@@ -183,11 +183,13 @@ export default function OqituvchilarPage() {
           <select
             value={yil}
             onChange={(e) => setYil(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {[2024, 2025, 2026].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
-          <span className="text-sm text-gray-500">{oyNomi(oy)} {yil}</span>
+          <div className="px-4 py-2 bg-primary/10 rounded-xl">
+            <span className="text-sm font-medium text-primary">{oyNomi(oy)} {yil}</span>
+          </div>
         </div>
 
         {/* Statistika */}
@@ -239,10 +241,10 @@ export default function OqituvchilarPage() {
                   <Tr key={o.id}>
                     <Td>
                       <div>
-                        <p className="font-medium text-gray-900">{o.ism}</p>
-                        <p className="text-xs text-gray-400">{o.email}</p>
+                        <p className="font-medium text-foreground">{o.ism}</p>
+                        <p className="text-sm text-muted-foreground">{o.email}</p>
                         {o.telefon && (
-                          <p className="text-xs text-gray-400 font-mono">{o.telefon}</p>
+                          <p className="text-xs text-muted-foreground font-mono mt-0.5">{o.telefon}</p>
                         )}
                       </div>
                     </Td>
@@ -262,19 +264,19 @@ export default function OqituvchilarPage() {
                       {o.guruhlar.length > 0 ? (
                         <button
                           onClick={() => { setGuruhOqituvchi(o); setGuruhModal(true); }}
-                          className="text-brand-600 text-sm hover:underline"
+                          className="text-primary text-sm font-medium hover:text-primary/80 hover:underline transition-colors"
                         >
                           {o.guruhlar.length} ta guruh
                         </button>
                       ) : (
-                        <span className="text-gray-400 text-xs">Guruh yo'q</span>
+                        <span className="text-muted-foreground/50 text-sm">Guruh yo'q</span>
                       )}
                     </Td>
 
                     <Td>
                       <div className="text-sm">
                         <Badge variant="purple">{ISH_HAQI_LABEL[o.ishHaqiTuri]}</Badge>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {o.ishHaqiTuri === "FOIZ" && o.foiz
                             ? `${o.foiz}%`
                             : o.ishHaqiTuri === "SOATLIK" && o.soatlik
@@ -286,11 +288,11 @@ export default function OqituvchilarPage() {
                       </div>
                     </Td>
 
-                    <Td className="font-medium">
+                    <Td className="font-medium text-foreground">
                       {o.oylikDaromad.toLocaleString()} so'm
                     </Td>
 
-                    <Td className="font-semibold text-gray-900">
+                    <Td className="font-bold text-foreground">
                       {o.hisoblangan.toLocaleString()} so'm
                     </Td>
 
@@ -344,13 +346,13 @@ export default function OqituvchilarPage() {
         {tanlangan && (
           <div className="space-y-4">
             {/* O'qituvchi ma'lumoti */}
-            <div className="p-4 bg-gray-50 rounded-xl space-y-1">
-              <p className="font-medium text-gray-900">{tanlangan.ism}</p>
-              <p className="text-xs text-gray-500">{oyNomi(oy)} {yil} oy uchun</p>
-              <div className="flex items-center gap-4 mt-2 text-xs text-gray-600">
-                <span>Guruhlar: <b>{tanlangan.guruhlar.length} ta</b></span>
-                <span>Daromad: <b>{tanlangan.oylikDaromad.toLocaleString()} so'm</b></span>
-                <span>
+            <div className="p-4 bg-muted/50 rounded-xl border border-border space-y-2">
+              <p className="font-semibold text-foreground">{tanlangan.ism}</p>
+              <p className="text-sm text-muted-foreground">{oyNomi(oy)} {yil} oy uchun</p>
+              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground flex-wrap">
+                <span>Guruhlar: <span className="font-semibold text-foreground">{tanlangan.guruhlar.length} ta</span></span>
+                <span>Daromad: <span className="font-semibold text-foreground">{tanlangan.oylikDaromad.toLocaleString()} so'm</span></span>
+                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-lg text-xs font-medium">
                   {tanlangan.ishHaqiTuri === "FOIZ"
                     ? `${tanlangan.foiz}%`
                     : tanlangan.ishHaqiTuri === "SOATLIK"
@@ -376,8 +378,13 @@ export default function OqituvchilarPage() {
             />
 
             {xato && (
-              <div className="px-3 py-2 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600">
-                {xato}
+              <div className="flex items-center gap-3 px-4 py-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-destructive flex-shrink-0">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span className="text-sm text-destructive font-medium">{xato}</span>
               </div>
             )}
 
@@ -460,20 +467,28 @@ export default function OqituvchilarPage() {
             {guruhOqituvchi.guruhlar.map((g) => (
               <div
                 key={g.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+                className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border hover:border-primary/20 transition-colors"
               >
                 <div>
-                  <p className="font-medium text-sm text-gray-900">{g.nom}</p>
-                  <p className="text-xs text-gray-400">{g.kursNom}</p>
+                  <p className="font-semibold text-foreground">{g.nom}</p>
+                  <p className="text-sm text-muted-foreground">{g.kursNom}</p>
                 </div>
-                <div className="text-right text-xs text-gray-500">
-                  <p>{g.talabaSoni} talaba</p>
-                  <p>{g.darslarSoni} dars ({oyNomi(oy)})</p>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-foreground">{g.talabaSoni} talaba</p>
+                  <p className="text-sm text-muted-foreground">{g.darslarSoni} dars ({oyNomi(oy)})</p>
                 </div>
               </div>
             ))}
             {guruhOqituvchi.guruhlar.length === 0 && (
-              <p className="text-sm text-gray-400 text-center py-4">Guruh yo'q</p>
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                </div>
+                <p className="text-muted-foreground">Guruh yo'q</p>
+              </div>
             )}
           </div>
         )}

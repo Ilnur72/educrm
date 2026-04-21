@@ -55,10 +55,15 @@ function tolovHolat(talaba: Talaba, kursNarxi: number) {
 
 function Avatar({ ism, familiya }: { ism: string; familiya: string }) {
   const initials = `${ism[0]}${familiya[0]}`.toUpperCase();
-  const colors = ["bg-purple-100 text-purple-700","bg-teal-100 text-teal-700","bg-blue-100 text-blue-700","bg-amber-100 text-amber-700"];
-  const color  = colors[(ism.charCodeAt(0) + familiya.charCodeAt(0)) % colors.length];
+  const colors = [
+    "from-violet-500/20 to-violet-500/5 text-violet-700 ring-violet-500/20",
+    "from-emerald-500/20 to-emerald-500/5 text-emerald-700 ring-emerald-500/20",
+    "from-blue-500/20 to-blue-500/5 text-blue-700 ring-blue-500/20",
+    "from-amber-500/20 to-amber-500/5 text-amber-700 ring-amber-500/20"
+  ];
+  const color = colors[(ism.charCodeAt(0) + familiya.charCodeAt(0)) % colors.length];
   return (
-    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 ${color}`}>
+    <div className={`w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-semibold flex-shrink-0 ring-2 ${color}`}>
       {initials}
     </div>
   );
@@ -85,11 +90,31 @@ export default function GuruhDetailPage() {
   }, [id]);
 
   if (yuklanyapti) return (
-    <div><Topbar title="Yuklanmoqda..." /><div className="p-6 text-center text-gray-400 py-20">Yuklanmoqda...</div></div>
+    <div>
+      <Topbar title="Yuklanmoqda..." />
+      <div className="p-6 flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full border-3 border-primary/20 border-t-primary animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yuklanmoqda...</p>
+        </div>
+      </div>
+    </div>
   );
 
   if (!guruh) return (
-    <div><Topbar title="Topilmadi" /><div className="p-6 text-center text-gray-400 py-20">Guruh topilmadi</div></div>
+    <div>
+      <Topbar title="Topilmadi" />
+      <div className="p-6 text-center py-20">
+        <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <p className="text-muted-foreground">Guruh topilmadi</p>
+      </div>
+    </div>
   );
 
   const jamiTolov     = guruh.talabalar.reduce((s, tg) => s + tg.talaba.tolovlar.reduce((ss, t) => ss + t.summa, 0), 0);
@@ -174,16 +199,16 @@ export default function GuruhDetailPage() {
                         key={tg.id}
                         onClick={() => router.push(`/dashboard/talabalar/${tg.talaba.id}`)}
                       >
-                        <Td className="text-gray-400 text-xs">{String(i + 1).padStart(2, "0")}</Td>
+                        <Td className="text-muted-foreground text-xs font-mono">{String(i + 1).padStart(2, "0")}</Td>
                         <Td>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <Avatar ism={tg.talaba.ism} familiya={tg.talaba.familiya} />
-                            <span className="font-medium">{tg.talaba.ism} {tg.talaba.familiya}</span>
+                            <span className="font-medium text-foreground">{tg.talaba.ism} {tg.talaba.familiya}</span>
                           </div>
                         </Td>
-                        <Td className="font-mono text-xs text-gray-500">{tg.talaba.telefon}</Td>
-                        <Td className="font-medium">
-                          {summa > 0 ? formatSum(summa) : "—"}
+                        <Td><span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">{tg.talaba.telefon}</span></Td>
+                        <Td className="font-medium text-foreground">
+                          {summa > 0 ? formatSum(summa) : <span className="text-muted-foreground/50">—</span>}
                         </Td>
                         <Td><Badge variant={holat.variant}>{holat.label}</Badge></Td>
                       </Tr>
@@ -223,16 +248,16 @@ export default function GuruhDetailPage() {
                   const foiz    = jami > 0 ? Math.round((keldi / jami) * 100) : 0;
                   return (
                     <Tr key={d.id}>
-                      <Td className="font-mono text-xs">{formatSana(d.sana)}</Td>
-                      <Td className="text-gray-600">{d.mavzu ?? "—"}</Td>
-                      <Td className="text-green-600 font-medium">{keldi}</Td>
-                      <Td className="text-red-500 font-medium">{kelmadi}</Td>
+                      <Td><span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">{formatSana(d.sana)}</span></Td>
+                      <Td className="text-muted-foreground">{d.mavzu ?? <span className="text-muted-foreground/50">—</span>}</Td>
+                      <Td><span className="text-emerald-600 font-semibold">{keldi}</span></Td>
+                      <Td><span className="text-red-500 font-semibold">{kelmadi}</span></Td>
                       <Td>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-green-400 rounded-full" style={{ width: `${foiz}%` }} />
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-300" style={{ width: `${foiz}%` }} />
                           </div>
-                          <span className="text-xs text-gray-500">{foiz}%</span>
+                          <span className="text-xs font-medium text-foreground">{foiz}%</span>
                         </div>
                       </Td>
                     </Tr>
@@ -263,8 +288,15 @@ export default function GuruhDetailPage() {
             </div>
           ) : (
             <>
-              <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700">
-                Barcha ota-onalarga Telegram orqali dars bekor qilinishi haqida xabar yuboriladi.
+              <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200/60 rounded-2xl">
+                <div className="p-2 bg-red-100 rounded-xl flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </div>
+                <p className="text-sm text-red-700">Barcha ota-onalarga Telegram orqali dars bekor qilinishi haqida xabar yuboriladi.</p>
               </div>
               <Input
                 label="Dars sanasi *"
@@ -273,9 +305,9 @@ export default function GuruhDetailPage() {
                 onChange={(e) => setBekorSana(e.target.value)}
               />
               <div>
-                <label className="text-xs font-medium text-gray-600 block mb-1">Sabab (ixtiyoriy)</label>
+                <label className="text-sm font-medium text-foreground block mb-2">Sabab (ixtiyoriy)</label>
                 <textarea
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl bg-background text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary transition-colors"
                   rows={2}
                   placeholder="O'qituvchi kasalligi, bayram..."
                   value={bekorSabab}
@@ -312,18 +344,18 @@ export default function GuruhDetailPage() {
 
 function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="flex justify-between gap-2">
-      <span className="text-gray-400 shrink-0">{label}</span>
-      <span className={`text-gray-800 text-right ${mono ? "font-mono text-xs" : ""}`}>{value}</span>
+    <div className="flex justify-between gap-2 py-1">
+      <span className="text-muted-foreground shrink-0">{label}</span>
+      <span className={`text-foreground text-right font-medium ${mono ? "font-mono text-xs bg-muted px-2 py-0.5 rounded-lg" : ""}`}>{value}</span>
     </div>
   );
 }
 
 function MiniStat({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-4">
-      <p className={`text-xl font-bold ${color ?? "text-gray-900"}`}>{value}</p>
-      <p className="text-xs text-gray-400 mt-0.5">{label}</p>
+    <div className="bg-card border border-border rounded-2xl p-5 shadow-soft">
+      <p className={`text-2xl font-bold ${color ?? "text-foreground"}`}>{value}</p>
+      <p className="text-sm text-muted-foreground mt-1">{label}</p>
     </div>
   );
 }
