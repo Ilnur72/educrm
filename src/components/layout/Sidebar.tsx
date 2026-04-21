@@ -18,6 +18,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/lidlar",             icon: "◎", label: "Lidlar",            roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/talabalar",          icon: "◉", label: "Talabalar",         roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/kurslar",            icon: "▤", label: "Kurslar",           roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/guruhlar",           icon: "▣", label: "Guruhlar",          roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/davomat",            icon: "▣", label: "Davomat" },
   { href: "/dashboard/tolovlar",           icon: "◈", label: "To'lovlar",         roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/jadval",             icon: "▦", label: "Dars jadvali" },
