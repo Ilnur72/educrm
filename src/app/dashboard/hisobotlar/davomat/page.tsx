@@ -23,17 +23,16 @@ type Hisobot = {
 
 type GuruhOption = { id: string; nom: string; kurs: { nom: string } };
 
-// 0=Ya 1=Du 2=Se 3=Ch 4=Pa 5=Ju 6=Sh
 const HAFTA = ["Ya", "Du", "Se", "Ch", "Pa", "Ju", "Sh"];
 
 function Avatar({ ism, familiya }: { ism: string; familiya: string }) {
   const colors = [
     "bg-purple-100 text-purple-700", "bg-teal-100 text-teal-700",
-    "bg-blue-100 text-blue-700",   "bg-amber-100 text-amber-700",
+    "bg-blue-100 text-blue-700", "bg-amber-100 text-amber-700",
   ];
   const color = colors[(ism.charCodeAt(0) + familiya.charCodeAt(0)) % colors.length];
   return (
-    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${color}`}>
+    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${color}`}>
       {`${ism[0]}${familiya[0]}`.toUpperCase()}
     </div>
   );
@@ -41,42 +40,50 @@ function Avatar({ ism, familiya }: { ism: string; familiya: string }) {
 
 function DayCell({ record }: { record: DayRecord | undefined }) {
   if (!record) {
-    return <td className="w-9 h-9 text-center border-r border-gray-100" />;
+    return (
+      <td className="border-r border-gray-100 p-0">
+        <div className="w-10 h-10" />
+      </td>
+    );
   }
+
   const { holat, baho } = record;
 
   if (holat === "KELMADI") {
     return (
-      <td className="w-9 text-center border-r border-gray-100 p-0">
-        <div className="mx-auto w-8 h-8 flex items-center justify-center rounded bg-red-100">
-          <span className="text-red-600 text-[11px] font-semibold">YK</span>
+      <td className="border-r border-gray-100 p-0 text-center">
+        <div className="w-10 h-10 mx-auto flex items-center justify-center bg-red-400 rounded">
+          <span className="text-white text-[11px] font-bold">YK</span>
         </div>
       </td>
     );
   }
+
   if (holat === "SABABLI") {
     return (
-      <td className="w-9 text-center border-r border-gray-100 p-0">
-        <div className="mx-auto w-8 h-8 flex items-center justify-center rounded bg-blue-100">
-          <span className="text-blue-600 text-[11px] font-semibold">S</span>
+      <td className="border-r border-gray-100 p-0 text-center">
+        <div className="w-10 h-10 mx-auto flex items-center justify-center bg-blue-300 rounded">
+          <span className="text-white text-[11px] font-bold">S</span>
         </div>
       </td>
     );
   }
-  // KELDI or KECH_KELDI
+
+  // KELDI yoki KECH_KELDI — ball bor bo'lsa raqam, yo'q bo'lsa K
   if (baho !== null && baho !== undefined) {
     return (
-      <td className="w-9 text-center border-r border-gray-100 p-0">
-        <div className="mx-auto w-8 h-8 flex items-center justify-center rounded bg-green-50">
-          <span className="text-gray-800 text-[11px] font-bold">{baho}</span>
+      <td className="border-r border-gray-100 p-0 text-center">
+        <div className="w-10 h-10 mx-auto flex items-center justify-center">
+          <span className="text-gray-800 text-[13px] font-bold">{baho}</span>
         </div>
       </td>
     );
   }
+
   return (
-    <td className="w-9 text-center border-r border-gray-100 p-0">
-      <div className="mx-auto w-8 h-8 flex items-center justify-center rounded bg-green-400">
-        <span className="text-white text-[11px] font-semibold">K</span>
+    <td className="border-r border-gray-100 p-0 text-center">
+      <div className="w-10 h-10 mx-auto flex items-center justify-center bg-green-400 rounded">
+        <span className="text-white text-[11px] font-bold">K</span>
       </div>
     </td>
   );
@@ -111,7 +118,7 @@ export default function DavomatHisobotiPage() {
         @media print {
           body * { visibility: hidden; }
           #dp, #dp * { visibility: visible; }
-          #dp { position: fixed; top: 0; left: 0; width: 100%; padding: 8px; font-size: 11px; }
+          #dp { position: fixed; top: 0; left: 0; width: 100%; padding: 8px; }
           .no-print { display: none !important; }
         }
       `}</style>
@@ -131,13 +138,12 @@ export default function DavomatHisobotiPage() {
       </div>
 
       <div className="p-6" id="dp">
-        {/* ─── Filter bar ─── */}
-        <div className="flex items-center justify-between mb-4 no-print">
-          {/* Chap: guruh */}
+        {/* ─── Filter qatori ─── */}
+        <div className="flex items-end justify-between mb-5 no-print">
           <div>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Guruh</p>
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Guruh</p>
             <select
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 min-w-48"
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 min-w-52"
               value={guruhId}
               onChange={e => setGuruhId(e.target.value)}
             >
@@ -147,10 +153,9 @@ export default function DavomatHisobotiPage() {
               ))}
             </select>
           </div>
-          {/* O'ng: oy + yil */}
           <div className="flex items-end gap-2">
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Oy</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Oy</p>
               <select
                 className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
                 value={oy} onChange={e => setOy(parseInt(e.target.value))}
@@ -161,18 +166,17 @@ export default function DavomatHisobotiPage() {
               </select>
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Yil</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Yil</p>
               <select
                 className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
                 value={yil} onChange={e => setYil(parseInt(e.target.value))}
               >
-                {[2024,2025,2026].map(y => <option key={y} value={y}>{y}</option>)}
+                {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
           </div>
         </div>
 
-        {/* ─── States ─── */}
         {!guruhId ? (
           <div className="text-center py-20 text-gray-400">
             <p className="text-4xl mb-3">📋</p>
@@ -187,82 +191,62 @@ export default function DavomatHisobotiPage() {
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
 
-            {/* Guruh sarlavhasi */}
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-              <div>
-                <span className="font-semibold text-gray-900">{data.guruhNom}</span>
-                <span className="text-xs text-gray-400 ml-2">· {data.kursNom} · {oyNomi(data.oy)} {data.yil}</span>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-gray-500 no-print">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded bg-green-400 inline-flex items-center justify-center text-white font-bold text-[9px]">K</span>
-                  Keldi
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded bg-green-50 border border-green-200 inline-flex items-center justify-center text-gray-700 font-bold text-[9px]">85</span>
-                  Keldi + Ball
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded bg-red-100 inline-flex items-center justify-center text-red-600 font-bold text-[9px]">YK</span>
-                  Kelmadi
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-4 h-4 rounded bg-blue-100 inline-flex items-center justify-center text-blue-600 font-bold text-[9px]">S</span>
-                  Sababli
-                </span>
-              </div>
-            </div>
-
             {/* ─── Jadval ─── */}
             <div className="overflow-x-auto">
               <table className="text-xs border-collapse" style={{ minWidth: "max-content" }}>
                 <thead>
-                  {/* Qator 1: hafta kunlari */}
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="sticky left-0 bg-gray-50 z-10 w-10 border-r border-gray-100 py-2" />
-                    <th className="sticky left-10 bg-gray-50 z-10 w-44 border-r border-gray-200 py-2 px-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                  {/* 1-qator: hafta kunlari */}
+                  <tr className="border-b border-gray-100">
+                    <th className="sticky left-0 z-20 bg-gray-50 w-8 py-2 border-r border-gray-100" />
+                    <th className="sticky left-8 z-20 bg-gray-50 w-48 py-2 px-3 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-r border-gray-200">
                       O&apos;QUVCHI
                     </th>
                     {data.sanalar.map((s) => (
-                      <th key={s.kun} className="w-9 py-1.5 text-center text-[10px] font-semibold text-gray-400 border-r border-gray-100">
+                      <th key={`h-${s.kun}`} className="w-10 py-2 text-center text-[10px] font-semibold text-gray-400 border-r border-gray-100 bg-gray-50">
                         {HAFTA[s.hafta]}
                       </th>
                     ))}
-                    <th className="w-14 py-2 text-center text-[10px] font-semibold text-gray-500 border-l border-gray-200 px-2">Keldi</th>
-                    <th className="w-16 py-2 text-center text-[10px] font-semibold text-gray-500 border-l border-gray-200 px-2">Kelmadi</th>
-                    <th className="w-24 py-2 text-center text-[10px] font-semibold text-gray-500 border-l border-gray-200 px-2">O&apos;rtacha baho</th>
+                    <th className="w-14 py-2 text-center text-[10px] font-semibold text-green-600 border-l border-gray-200 bg-gray-50 px-2">
+                      Keldi
+                    </th>
+                    <th className="w-16 py-2 text-center text-[10px] font-semibold text-red-500 border-l border-gray-200 bg-gray-50 px-2">
+                      Kelmadi
+                    </th>
+                    <th className="w-28 py-2 text-center text-[10px] font-semibold text-gray-500 border-l border-gray-200 bg-gray-50 px-2">
+                      O&apos;rtacha baho
+                    </th>
                   </tr>
-                  {/* Qator 2: kun raqamlari */}
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="sticky left-0 bg-gray-50 z-10 w-10 border-r border-gray-100" />
-                    <th className="sticky left-10 bg-gray-50 z-10 w-44 border-r border-gray-200" />
+                  {/* 2-qator: kun raqamlari */}
+                  <tr className="border-b border-gray-200">
+                    <th className="sticky left-0 z-20 bg-gray-50 w-8 border-r border-gray-100" />
+                    <th className="sticky left-8 z-20 bg-gray-50 w-48 border-r border-gray-200" />
                     {data.sanalar.map((s) => (
-                      <th key={s.kun} className="w-9 py-1 text-center text-[11px] font-bold text-gray-600 border-r border-gray-100">
+                      <th key={`d-${s.kun}`} className="w-10 py-1.5 text-center text-[12px] font-bold text-gray-700 border-r border-gray-100 bg-gray-50">
                         {s.kun}
                       </th>
                     ))}
-                    <th className="border-l border-gray-200" />
-                    <th className="border-l border-gray-200" />
-                    <th className="border-l border-gray-200" />
+                    <th className="border-l border-gray-200 bg-gray-50" />
+                    <th className="border-l border-gray-200 bg-gray-50" />
+                    <th className="border-l border-gray-200 bg-gray-50" />
                   </tr>
                 </thead>
                 <tbody>
                   {data.talabalar.map((t, i) => (
                     <tr
                       key={t.id}
-                      className={`border-b border-gray-50 hover:bg-brand-50/20 transition-colors ${
-                        i % 2 === 1 ? "bg-gray-50/30" : "bg-white"
+                      className={`border-b border-gray-100 hover:bg-blue-50/30 transition-colors ${
+                        i % 2 === 1 ? "bg-gray-50/40" : "bg-white"
                       }`}
                     >
-                      {/* Raqam */}
-                      <td className="sticky left-0 bg-inherit z-10 w-10 text-center text-xs text-gray-400 border-r border-gray-100 py-2">
+                      {/* # */}
+                      <td className="sticky left-0 z-10 bg-inherit w-8 text-center text-[11px] text-gray-400 border-r border-gray-100 py-1">
                         {i + 1}
                       </td>
                       {/* Ism */}
-                      <td className="sticky left-10 bg-inherit z-10 w-44 px-3 py-2 border-r border-gray-200">
+                      <td className="sticky left-8 z-10 bg-inherit w-48 px-3 py-1 border-r border-gray-200">
                         <div className="flex items-center gap-2">
                           <Avatar ism={t.ism} familiya={t.familiya} />
-                          <span className="font-medium text-gray-800 truncate max-w-[110px] text-[12px]">
+                          <span className="font-medium text-gray-800 text-[12px] truncate max-w-[110px]">
                             {t.ism} {t.familiya}
                           </span>
                         </div>
@@ -272,26 +256,26 @@ export default function DavomatHisobotiPage() {
                         <DayCell key={s.kun} record={t.kunlar[s.kun]} />
                       ))}
                       {/* Keldi */}
-                      <td className="w-14 text-center border-l border-gray-200 py-2">
-                        <span className="font-semibold text-gray-700 text-[12px]">{t.keldi + t.kech}</span>
+                      <td className="w-14 text-center border-l border-gray-200 py-1">
+                        <span className="font-bold text-gray-700 text-[13px]">{t.keldi + t.kech}</span>
                       </td>
                       {/* Kelmadi */}
-                      <td className="w-16 text-center border-l border-gray-200 py-2">
-                        <span className={`font-semibold text-[12px] ${t.kelmadi > 0 ? "text-red-500" : "text-gray-400"}`}>
-                          {t.kelmadi}
+                      <td className="w-16 text-center border-l border-gray-200 py-1">
+                        <span className={`font-bold text-[13px] ${t.kelmadi > 0 ? "text-red-500" : "text-gray-300"}`}>
+                          {t.kelmadi || 0}
                         </span>
                       </td>
                       {/* O'rtacha baho */}
-                      <td className="w-24 text-center border-l border-gray-200 py-2 px-2">
+                      <td className="w-28 text-center border-l border-gray-200 py-1 px-2">
                         {t.ortachaBaho !== null ? (
-                          <span className={`font-bold text-[12px] ${
+                          <span className={`font-bold text-[13px] ${
                             t.ortachaBaho >= 80 ? "text-green-600" :
                             t.ortachaBaho >= 60 ? "text-amber-600" : "text-red-500"
                           }`}>
                             {t.ortachaBaho}
                           </span>
                         ) : (
-                          <span className="text-gray-300 text-[12px]">—</span>
+                          <span className="text-gray-300">—</span>
                         )}
                       </td>
                     </tr>
@@ -300,31 +284,41 @@ export default function DavomatHisobotiPage() {
               </table>
             </div>
 
-            {/* ─── Footer ─── */}
-            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex flex-wrap gap-6 text-xs text-gray-500">
-              <span>Jami o&apos;quvchilar: <b className="text-gray-800">{data.talabalar.length}</b></span>
-              <span>Dars kunlari: <b className="text-gray-800">{data.sanalar.length}</b></span>
+            {/* ─── Legend + Footer ─── */}
+            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/60 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500">
+              {/* Legend */}
+              <div className="flex items-center gap-4 mr-4">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded bg-green-400 inline-flex items-center justify-center text-white font-bold text-[9px]">K</span>
+                  Keldi
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded border border-gray-200 inline-flex items-center justify-center text-gray-700 font-bold text-[9px]">85</span>
+                  Keldi + Baho
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded bg-red-400 inline-flex items-center justify-center text-white font-bold text-[9px]">YK</span>
+                  Kelmadi
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded bg-blue-300 inline-flex items-center justify-center text-white font-bold text-[9px]">S</span>
+                  Sababli
+                </span>
+              </div>
+              {/* Stats */}
+              <span className="ml-auto">
+                Jami: <b className="text-gray-800">{data.talabalar.length}</b> o&apos;quvchi
+              </span>
+              <span>
+                Dars kunlari: <b className="text-gray-800">{data.sanalar.length}</b>
+              </span>
               {(() => {
-                const bilan = data.talabalar.filter(t => t.ortachaBaho !== null);
-                if (bilan.length === 0) return null;
-                const ort = Math.round(bilan.reduce((s, t) => s + (t.ortachaBaho ?? 0), 0) / bilan.length * 10) / 10;
-                return (
-                  <span>O&apos;rtacha baho:
-                    <b className={`ml-1 ${ort >= 80 ? "text-green-600" : ort >= 60 ? "text-amber-600" : "text-red-500"}`}>
-                      {ort}
-                    </b>
-                  </span>
-                );
-              })()}
-              {(() => {
-                const jami = data.talabalar.reduce((s, t) => s + t.keldi + t.kech + t.kelmadi + t.sababli, 0);
+                const jami  = data.talabalar.reduce((s, t) => s + t.keldi + t.kech + t.kelmadi + t.sababli, 0);
                 const keldi = data.talabalar.reduce((s, t) => s + t.keldi + t.kech, 0);
-                if (jami === 0) return null;
+                if (!jami) return null;
                 const foiz = Math.round(keldi / jami * 100);
                 return (
-                  <span>Davomat foizi:
-                    <b className={`ml-1 ${foiz >= 80 ? "text-green-600" : "text-amber-600"}`}>{foiz}%</b>
-                  </span>
+                  <span>Davomat: <b className={foiz >= 80 ? "text-green-600" : "text-amber-600"}>{foiz}%</b></span>
                 );
               })()}
             </div>
