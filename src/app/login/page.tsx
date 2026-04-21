@@ -29,9 +29,20 @@ function LoginForm() {
       return;
     }
 
-    const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
-    router.push(callbackUrl);
-    router.refresh();
+    // CallbackUrl dan faqat pathname olish (to'liq URL bo'lsa)
+    let redirectPath = "/dashboard";
+    const callbackUrl = params.get("callbackUrl");
+    if (callbackUrl) {
+      try {
+        const url = new URL(callbackUrl);
+        redirectPath = url.pathname;
+      } catch {
+        // URL emas, to'g'ridan-to'g'ri path
+        redirectPath = callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
+      }
+    }
+
+    window.location.href = redirectPath;
   };
 
   return (
