@@ -191,7 +191,15 @@ export default function KurslarPage() {
 
       <div className="p-6 space-y-5">
         {kurslar.length === 0 && (
-          <div className="text-center py-16 text-gray-400 text-sm">Hali kurs qo'shilmagan</div>
+          <div className="text-center py-20">
+            <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+              </svg>
+            </div>
+            <p className="text-muted-foreground">Hali kurs qo'shilmagan</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Birinchi kursni qo'shish uchun yuqoridagi tugmani bosing</p>
+          </div>
         )}
 
         {kurslar.map((kurs) => {
@@ -218,10 +226,10 @@ export default function KurslarPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {kurs.davomiyligi} oy · {kurs.narxi.toLocaleString()} so'm/oy · {jamiTalaba} talaba
                   </p>
-                  {kurs.tavsif && <p className="text-xs text-gray-400 mt-0.5">{kurs.tavsif}</p>}
+                  {kurs.tavsif && <p className="text-sm text-muted-foreground/80 mt-0.5">{kurs.tavsif}</p>}
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={kurs.faol ? "green" : "gray"}>
@@ -256,7 +264,7 @@ export default function KurslarPage() {
                         <Td>
                           <Link
                             href={`/dashboard/guruhlar/${g.id}`}
-                            className="font-medium text-brand-600 hover:underline"
+                            className="font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {g.nom}
@@ -264,8 +272,8 @@ export default function KurslarPage() {
                         </Td>
                         <Td>{g.oqituvchi?.user.name ?? "—"}</Td>
                         <Td>{g.xona ?? "—"}</Td>
-                        <Td className="text-xs text-gray-500">{g.kunlar.join(", ")}</Td>
-                        <Td className="font-mono text-xs">{g.vaqt}</Td>
+                        <Td className="text-sm text-muted-foreground">{g.kunlar.join(", ")}</Td>
+                        <Td><span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">{g.vaqt}</span></Td>
                         <Td>
                           {(() => {
                             const foiz = g._count.talabalar / kurs.maxTalaba;
@@ -361,14 +369,14 @@ export default function KurslarPage() {
               onChange={(e) => setGuruhForm({ ...guruhForm, vaqt: e.target.value })} />
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-600 mb-2">Dars kunlari</p>
+            <p className="text-sm font-medium text-foreground mb-2">Dars kunlari</p>
             <div className="flex gap-2 flex-wrap">
               {KUNLAR.map((kun) => (
                 <button key={kun} type="button" onClick={() => kunToggle(kun)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
                     guruhForm.kunlar.includes(kun)
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-brand-400"
+                      ? "gradient-primary text-white border-transparent shadow-soft"
+                      : "bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
                   }`}>
                   {kun}
                 </button>
@@ -380,8 +388,13 @@ export default function KurslarPage() {
               onChange={(e) => setGuruhForm({ ...guruhForm, boshlanish: e.target.value })} />
           )}
           {guruhXato && (
-            <div className="px-3 py-2.5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-              ⚠ {guruhXato}
+            <div className="flex items-center gap-3 px-4 py-3 bg-destructive/10 border border-destructive/20 rounded-xl">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-destructive flex-shrink-0">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span className="text-sm text-destructive font-medium">{guruhXato}</span>
             </div>
           )}
           <div className="flex justify-end gap-3 pt-2">

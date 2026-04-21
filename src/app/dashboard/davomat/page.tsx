@@ -11,11 +11,11 @@ import type { DavomatHolat } from "@/types";
 type TalabaRow = { id: string; ism: string; familiya: string };
 type Guruh = { id: string; nom: string };
 
-const HOLAT_OPTIONS: { value: DavomatHolat; label: string; color: string; short: string }[] = [
-  { value: "KELDI",      label: "Keldi",       color: "bg-green-100 text-green-700",  short: "K" },
-  { value: "KELMADI",    label: "Kelmadi",     color: "bg-red-100 text-red-700",      short: "X" },
-  { value: "KECH_KELDI", label: "Kech keldi",  color: "bg-amber-100 text-amber-700",  short: "KK" },
-  { value: "SABABLI",    label: "Sababli",     color: "bg-blue-100 text-blue-700",    short: "S" },
+const HOLAT_OPTIONS: { value: DavomatHolat; label: string; color: string; short: string; ring: string }[] = [
+  { value: "KELDI",      label: "Keldi",       color: "bg-emerald-100 text-emerald-700", ring: "ring-emerald-500", short: "K" },
+  { value: "KELMADI",    label: "Kelmadi",     color: "bg-red-100 text-red-700",         ring: "ring-red-500",     short: "X" },
+  { value: "KECH_KELDI", label: "Kech keldi",  color: "bg-amber-100 text-amber-700",     ring: "ring-amber-500",   short: "KK" },
+  { value: "SABABLI",    label: "Sababli",     color: "bg-blue-100 text-blue-700",       ring: "ring-blue-500",    short: "S" },
 ];
 
 export default function DavomatPage() {
@@ -111,22 +111,22 @@ export default function DavomatPage() {
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-600 block mb-1">Sana</label>
+              <label className="text-sm font-medium text-foreground block mb-2">Sana</label>
               <input
                 type="date"
                 value={sana}
                 onChange={(e) => setSana(e.target.value)}
-                className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div className="flex-1 min-w-48">
-              <label className="text-xs font-medium text-gray-600 block mb-1">Dars mavzusi</label>
+              <label className="text-sm font-medium text-foreground block mb-2">Dars mavzusi</label>
               <input
                 type="text"
                 placeholder="Ixtiyoriy..."
                 value={mavzu}
                 onChange={(e) => setMavzu(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                className="w-full px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
           </CardBody>
@@ -134,24 +134,24 @@ export default function DavomatPage() {
 
         {/* Statistika */}
         {talabalar.length > 0 && (
-          <div className="grid grid-cols-4 gap-3">
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-semibold text-gray-900">{talabalar.length}</p>
-              <p className="text-xs text-gray-500 mt-1">Jami</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-card border border-border rounded-2xl p-5 text-center shadow-soft">
+              <p className="text-3xl font-bold text-foreground">{talabalar.length}</p>
+              <p className="text-sm text-muted-foreground mt-1">Jami</p>
             </div>
-            <div className="bg-green-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-semibold text-green-700">{keldiCount}</p>
-              <p className="text-xs text-green-600 mt-1">Keldi</p>
+            <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-5 text-center shadow-soft">
+              <p className="text-3xl font-bold text-emerald-700">{keldiCount}</p>
+              <p className="text-sm text-emerald-600 mt-1">Keldi</p>
             </div>
-            <div className="bg-red-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-semibold text-red-600">{kelmadyCount}</p>
-              <p className="text-xs text-red-500 mt-1">Kelmadi</p>
+            <div className="bg-red-50 border border-red-200/60 rounded-2xl p-5 text-center shadow-soft">
+              <p className="text-3xl font-bold text-red-600">{kelmadyCount}</p>
+              <p className="text-sm text-red-500 mt-1">Kelmadi</p>
             </div>
-            <div className="bg-blue-50 rounded-xl p-4 text-center">
-              <p className="text-2xl font-semibold text-blue-700">
+            <div className="bg-blue-50 border border-blue-200/60 rounded-2xl p-5 text-center shadow-soft">
+              <p className="text-3xl font-bold text-blue-700">
                 {talabalar.length > 0 ? Math.round((keldiCount / talabalar.length) * 100) : 0}%
               </p>
-              <p className="text-xs text-blue-600 mt-1">Davomat</p>
+              <p className="text-sm text-blue-600 mt-1">Davomat</p>
             </div>
           </div>
         )}
@@ -174,29 +174,29 @@ export default function DavomatPage() {
                 </button>
               </div>
             </CardHeader>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-border">
               {talabalar.map((talaba, i) => {
                 const holat = davomatlar[talaba.id] ?? "KELDI";
                 const config = HOLAT_OPTIONS.find((h) => h.value === holat)!;
                 return (
-                  <div key={talaba.id} className="flex items-center gap-4 px-5 py-3">
-                    <span className="text-xs text-gray-400 w-6">{i + 1}</span>
+                  <div key={talaba.id} className="flex items-center gap-4 px-6 py-4 hover:bg-muted/30 transition-colors">
+                    <span className="text-xs text-muted-foreground font-mono w-6">{i + 1}</span>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">
+                      <p className="text-sm font-medium text-foreground">
                         {talaba.ism} {talaba.familiya}
                       </p>
                     </div>
                     {/* Tezkor tugmalar */}
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-2">
                       {HOLAT_OPTIONS.map((opt) => (
                         <button
                           key={opt.value}
                           onClick={() => belgilash(talaba.id, opt.value)}
                           className={cn(
-                            "w-10 h-8 rounded-lg text-xs font-medium transition-all",
+                            "w-11 h-9 rounded-xl text-xs font-semibold transition-all duration-200",
                             holat === opt.value
-                              ? `${opt.color} ring-2 ring-offset-1 ring-current`
-                              : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                              ? `${opt.color} ring-2 ring-offset-2 ${opt.ring}`
+                              : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
                           )}
                           title={opt.label}
                         >
@@ -205,7 +205,7 @@ export default function DavomatPage() {
                       ))}
                     </div>
                     {/* Holat badge */}
-                    <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium w-24 text-center", config.color)}>
+                    <span className={cn("px-3 py-1.5 rounded-xl text-xs font-semibold w-28 text-center", config.color)}>
                       {config.label}
                     </span>
                   </div>
@@ -216,11 +216,31 @@ export default function DavomatPage() {
         )}
 
         {guruhId && talabalar.length === 0 && (
-          <div className="text-center py-16 text-gray-400">Bu guruhda talaba yo'q</div>
+          <div className="text-center py-20">
+            <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+            </div>
+            <p className="text-muted-foreground">Bu guruhda talaba yo'q</p>
+          </div>
         )}
 
         {!guruhId && (
-          <div className="text-center py-16 text-gray-400">Guruhni tanlang</div>
+          <div className="text-center py-20">
+            <div className="w-16 h-16 rounded-full bg-muted mx-auto flex items-center justify-center mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+                <path d="m9 16 2 2 4-4"/>
+              </svg>
+            </div>
+            <p className="text-muted-foreground">Guruhni tanlang</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Davomat belgilash uchun avval guruhni tanlang</p>
+          </div>
         )}
       </div>
     </div>

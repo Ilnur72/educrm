@@ -16,11 +16,15 @@ type GuruhOption = { id: string; nom: string; kurs: { nom: string } };
 
 function Avatar({ ism, familiya }: { ism: string; familiya: string }) {
   const initials = `${ism[0]}${familiya[0]}`.toUpperCase();
-  const colors = ["bg-purple-100 text-purple-700", "bg-teal-100 text-teal-700",
-                  "bg-blue-100 text-blue-700", "bg-amber-100 text-amber-700"];
+  const colors = [
+    "from-violet-500/20 to-violet-500/5 text-violet-700 ring-violet-500/20", 
+    "from-emerald-500/20 to-emerald-500/5 text-emerald-700 ring-emerald-500/20",
+    "from-blue-500/20 to-blue-500/5 text-blue-700 ring-blue-500/20", 
+    "from-amber-500/20 to-amber-500/5 text-amber-700 ring-amber-500/20"
+  ];
   const color = colors[(ism.charCodeAt(0) + familiya.charCodeAt(0)) % colors.length];
   return (
-    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 ${color}`}>
+    <div className={`w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-semibold flex-shrink-0 ring-2 ${color}`}>
       {initials}
     </div>
   );
@@ -164,33 +168,39 @@ export default function TalabalarPage() {
                 const guruh = t.guruhlar[0]?.guruh;
                 return (
                   <Tr key={t.id} onClick={() => router.push(`/dashboard/talabalar/${t.id}`)}>
-                    <Td className="text-gray-400 text-xs">{String(i + 1).padStart(3, "0")}</Td>
+                    <Td className="text-muted-foreground text-xs font-mono">{String(i + 1).padStart(3, "0")}</Td>
                     <Td>
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-3">
                         <Avatar ism={t.ism} familiya={t.familiya} />
-                        <span className="font-medium text-gray-800">{t.ism} {t.familiya}</span>
-                        {xavfliIds.get(t.id) === "XAVFLI" && (
-                          <span title="Xavfli talaba" className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md font-medium">🔴</span>
-                        )}
-                        {xavfliIds.get(t.id) === "DIQQAT" && (
-                          <span title="Diqqat talab qiladi" className="text-xs bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-md font-medium">🟡</span>
-                        )}
+                        <div>
+                          <span className="font-medium text-foreground">{t.ism} {t.familiya}</span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {xavfliIds.get(t.id) === "XAVFLI" && (
+                              <span title="Xavfli talaba" className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-lg font-medium">Xavfli</span>
+                            )}
+                            {xavfliIds.get(t.id) === "DIQQAT" && (
+                              <span title="Diqqat talab qiladi" className="text-xs bg-amber-100 text-amber-600 px-2 py-0.5 rounded-lg font-medium">Diqqat</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </Td>
-                    <Td className="font-mono text-xs">{t.telefon}</Td>
-                    <Td className="text-gray-500 text-xs">{t.otaTelefon ?? "—"}</Td>
+                    <Td><span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">{t.telefon}</span></Td>
+                    <Td className="text-muted-foreground text-sm">{t.otaTelefon ?? "—"}</Td>
                     <Td>
                       {guruh ? (
                         <div>
-                          <p className="text-sm">{guruh.kurs.nom}</p>
-                          <p className="text-xs text-gray-400">{guruh.nom}</p>
+                          <p className="text-sm font-medium text-foreground">{guruh.kurs.nom}</p>
+                          <p className="text-xs text-muted-foreground">{guruh.nom}</p>
                         </div>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-muted-foreground/50">—</span>
                       )}
                     </Td>
-                    <Td className="font-medium">
-                      {guruh ? `${guruh.kurs.narxi.toLocaleString()} so'm` : "—"}
+                    <Td>
+                      {guruh ? (
+                        <span className="font-medium text-foreground">{guruh.kurs.narxi.toLocaleString()} so'm</span>
+                      ) : "—"}
                     </Td>
                     <Td><Badge variant={tolov.variant}>{tolov.label}</Badge></Td>
                     <Td>
@@ -208,8 +218,15 @@ export default function TalabalarPage() {
               })}
               {talabalar.length === 0 && (
                 <Tr>
-                  <Td colSpan={8} className="text-center text-gray-400 py-10">
-                    Talaba topilmadi
+                  <Td colSpan={8} className="text-center py-12">
+                    <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                    </div>
+                    <p className="text-muted-foreground">Talaba topilmadi</p>
                   </Td>
                 </Tr>
               )}
@@ -222,13 +239,15 @@ export default function TalabalarPage() {
       <Modal open={birikModal} onClose={() => setBirikModal(false)} title="Guruhga biriktirish">
         {birikTalaba && (
           <div className="space-y-4">
-            <div className="p-3 bg-gray-50 rounded-xl text-sm">
-              <p className="font-medium text-gray-900">{birikTalaba.ism} {birikTalaba.familiya}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{birikTalaba.telefon}</p>
+            <div className="p-4 bg-muted/50 rounded-xl border border-border">
+              <p className="font-semibold text-foreground">{birikTalaba.ism} {birikTalaba.familiya}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{birikTalaba.telefon}</p>
               {birikTalaba.guruhlar[0] && (
-                <p className="text-xs text-amber-600 mt-1">
-                  Hozir: {birikTalaba.guruhlar[0].guruh.kurs.nom} — {birikTalaba.guruhlar[0].guruh.nom}
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-lg font-medium">
+                    Hozir: {birikTalaba.guruhlar[0].guruh.kurs.nom} — {birikTalaba.guruhlar[0].guruh.nom}
+                  </span>
+                </div>
               )}
             </div>
             <Select

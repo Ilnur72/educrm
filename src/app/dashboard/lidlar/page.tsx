@@ -172,20 +172,20 @@ export default function LidlarPage() {
 
       <div className="p-6 space-y-5">
         {/* Funnel */}
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {FUNNEL.map((f) => (
             <button
               key={f.holat}
               onClick={() => setFilterHolat(filterHolat === f.holat ? "" : f.holat)}
-              className={`rounded-xl p-4 text-left border-2 transition-all ${
+              className={`rounded-2xl p-5 text-left border-2 transition-all duration-200 shadow-soft hover:shadow-soft-lg ${
                 filterHolat === f.holat
-                  ? "border-brand-600 bg-brand-50"
-                  : "border-transparent bg-white hover:border-gray-200"
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:border-primary/30"
               }`}
             >
-              <p className="text-2xl font-semibold text-gray-900">{holatCounts[f.holat] ?? 0}</p>
-              <p className="text-xs text-gray-500 mt-1">{f.label}</p>
-              <div className={`h-1 rounded-full mt-3 ${f.color.split(" ")[0]}`} />
+              <p className="text-3xl font-bold text-foreground">{holatCounts[f.holat] ?? 0}</p>
+              <p className="text-sm text-muted-foreground mt-1 font-medium">{f.label}</p>
+              <div className={`h-1.5 rounded-full mt-4 ${f.color.split(" ")[0]}`} />
             </button>
           ))}
         </div>
@@ -249,44 +249,44 @@ export default function LidlarPage() {
                 const guruhNom = talaba?.guruhlar?.[0]?.guruh?.nom;
                 return (
                   <Tr key={lid.id}>
-                    <Td className="font-medium">{lid.ism}</Td>
-                    <Td className="font-mono text-xs">{lid.telefon}</Td>
-                    <Td>{lid.kurs}</Td>
-                    <Td className="text-gray-500">{MANBA_LABEL[lid.manba as LidManba]}</Td>
-                    <Td className="text-xs text-gray-400">
+                    <Td className="font-medium text-foreground">{lid.ism}</Td>
+                    <Td><span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">{lid.telefon}</span></Td>
+                    <Td className="text-foreground">{lid.kurs}</Td>
+                    <Td className="text-muted-foreground">{MANBA_LABEL[lid.manba as LidManba]}</Td>
+                    <Td>
                       {lid.holat === "SINOV_DARSI" ? (
                         <input
                           type="date"
                           value={lid.sinovSanasi ? lid.sinovSanasi.slice(0, 10) : ""}
                           onChange={(e) => sinovSanasiniYangilash(lid.id, e.target.value)}
-                          className="text-xs border border-purple-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-purple-50 text-purple-700"
+                          className="text-xs border-2 border-violet-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-violet-400 bg-violet-50 text-violet-700 font-medium transition-colors"
                         />
                       ) : (
-                        formatSana(lid.createdAt)
+                        <span className="text-sm text-muted-foreground">{formatSana(lid.createdAt)}</span>
                       )}
                     </Td>
                     <Td><Badge variant={h.variant}>{h.label}</Badge></Td>
                     <Td>
                       {talaba ? (
-                        <div className="text-xs">
-                          <p className="font-medium text-gray-800">{talaba.ism} {talaba.familiya}</p>
-                          {guruhNom && <p className="text-gray-400">{guruhNom}</p>}
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{talaba.ism} {talaba.familiya}</p>
+                          {guruhNom && <p className="text-xs text-muted-foreground">{guruhNom}</p>}
                         </div>
                       ) : (
-                        <span className="text-gray-300 text-xs">—</span>
+                        <span className="text-muted-foreground/50">—</span>
                       )}
                     </Td>
                     <Td>
                       <div className="flex items-center gap-2">
                         {yozishMumkin && (
-                          <Button variant="secondary" size="sm" onClick={() => yozishOch(lid)}>
+                          <Button variant="primary" size="sm" onClick={() => yozishOch(lid)}>
                             Talabaga yozish
                           </Button>
                         )}
                         <Select
                           value={lid.holat}
                           onChange={(e) => yangilash(lid.id, e.target.value as LidHolat)}
-                          className="text-xs py-1 px-2 w-36"
+                          className="text-xs py-1.5 px-3 w-36"
                           disabled={lid.holat === "YOZILDI"}
                         >
                           {Object.entries(HOLAT_CONFIG)
@@ -300,9 +300,12 @@ export default function LidlarPage() {
                         </Select>
                         <button
                           onClick={() => ochirish(lid.id)}
-                          className="text-gray-300 hover:text-red-400 text-lg leading-none transition-colors"
+                          className="p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                         >
-                          ×
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                          </svg>
                         </button>
                       </div>
                     </Td>
@@ -311,7 +314,15 @@ export default function LidlarPage() {
               })}
               {lidlar.length === 0 && (
                 <Tr>
-                  <Td colSpan={8} className="text-center text-gray-400 py-8">Lid topilmadi</Td>
+                  <Td colSpan={8} className="text-center py-12">
+                    <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                      </svg>
+                    </div>
+                    <p className="text-muted-foreground">Lid topilmadi</p>
+                  </Td>
                 </Tr>
               )}
             </Tbody>
@@ -323,9 +334,9 @@ export default function LidlarPage() {
       <Modal open={yozishModal} onClose={() => setYozishModal(false)} title="Talabaga yozish">
         {yozishLid && (
           <div className="space-y-4">
-            <div className="p-3 bg-gray-50 rounded-xl text-sm space-y-1">
-              <p className="font-medium text-gray-900">{yozishLid.ism}</p>
-              <p className="text-xs text-gray-500">Qiziqgan kurs: {yozishLid.kurs}</p>
+            <div className="p-4 bg-muted/50 rounded-xl border border-border">
+              <p className="font-semibold text-foreground">{yozishLid.ism}</p>
+              <p className="text-sm text-muted-foreground mt-1">Qiziqgan kurs: <span className="font-medium text-foreground">{yozishLid.kurs}</span></p>
             </div>
             <Input
               label="Telefon *"
@@ -337,37 +348,37 @@ export default function LidlarPage() {
             {/* Tavsiya etilgan guruhlar */}
             {tavsiyalar.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-gray-600 mb-2">Tavsiya etilgan guruhlar</p>
-                <div className="grid grid-cols-2 gap-2">
+                <p className="text-sm font-medium text-foreground mb-3">Tavsiya etilgan guruhlar</p>
+                <div className="grid grid-cols-2 gap-3">
                   {tavsiyalar.map((g) => (
                     <button
                       key={g.id}
                       type="button"
                       onClick={() => setYozishGuruhId(g.id)}
-                      className={`text-left p-3 rounded-xl border-2 transition-all text-xs ${
+                      className={`text-left p-4 rounded-xl border-2 transition-all duration-200 ${
                         yozishGuruhId === g.id
-                          ? "border-brand-500 bg-brand-50"
+                          ? "border-primary bg-primary/5 shadow-soft"
                           : g.tolib
-                          ? "border-red-100 bg-red-50 opacity-60"
-                          : "border-gray-200 bg-white hover:border-brand-300"
+                          ? "border-red-200 bg-red-50/50 opacity-60"
+                          : "border-border bg-card hover:border-primary/40 hover:shadow-soft"
                       }`}
                     >
-                      <p className="font-semibold text-gray-900 truncate">{g.kursNom}</p>
-                      <p className="text-gray-500 truncate">{g.nom}</p>
-                      <div className="flex items-center justify-between mt-1.5 gap-1">
-                        <span className="text-gray-400">{g.vaqt}</span>
-                        <span className={`px-1.5 py-0.5 rounded-full font-medium ${
+                      <p className="font-semibold text-foreground truncate">{g.kursNom}</p>
+                      <p className="text-sm text-muted-foreground truncate">{g.nom}</p>
+                      <div className="flex items-center justify-between mt-2 gap-2">
+                        <span className="text-sm text-muted-foreground font-mono">{g.vaqt}</span>
+                        <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${
                           g.tolib
                             ? "bg-red-100 text-red-600"
                             : g.boshJoy <= 2
                             ? "bg-amber-100 text-amber-600"
-                            : "bg-green-100 text-green-600"
+                            : "bg-emerald-100 text-emerald-600"
                         }`}>
                           {g.tolib ? "To'lgan" : `${g.boshJoy} joy`}
                         </span>
                       </div>
                       {g.oqituvchi && (
-                        <p className="text-gray-400 mt-1 truncate">{g.oqituvchi}</p>
+                        <p className="text-sm text-muted-foreground mt-2 truncate">{g.oqituvchi}</p>
                       )}
                     </button>
                   ))}

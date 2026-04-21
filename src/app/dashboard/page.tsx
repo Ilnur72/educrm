@@ -73,9 +73,37 @@ async function getStats() {
 const lidHolatBadge: Record<string, { label: string; variant: "blue" | "amber" | "purple" | "green" | "red" }> = {
   YANGI:             { label: "Yangi",          variant: "blue"   },
   QONGIROQ_QILINDI:  { label: "Qo'ng'iroq",     variant: "amber"  },
-  SINOV_DARSI:       { label: "Sinov darsi",     variant: "purple" },
-  YOZILDI:           { label: "Yozildi",         variant: "green"  },
-  RAD_ETDI:          { label: "Rad etdi",        variant: "red"    },
+  SINOV_DARSI:       { label: "Sinov darsi",    variant: "purple" },
+  YOZILDI:           { label: "Yozildi",        variant: "green"  },
+  RAD_ETDI:          { label: "Rad etdi",       variant: "red"    },
+};
+
+// Icons for stats
+const icons = {
+  students: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  money: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
+  courses: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+    </svg>
+  ),
+  leads: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+    </svg>
+  ),
 };
 
 export default async function DashboardPage() {
@@ -90,53 +118,67 @@ export default async function DashboardPage() {
   return (
     <div>
       <Topbar
-        title={`${oyNomi(hozir.getMonth() + 1)} ${hozir.getFullYear()} — Dashboard`}
+        title="Dashboard"
+        subtitle={`${oyNomi(hozir.getMonth() + 1)} ${hozir.getFullYear()} — Umumiy ko'rinish`}
       />
 
       <div className="p-6 space-y-6">
         {/* Statistika */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             label="Jami talabalar"
             value={stats.jami_talabalar}
             sub="faol o'quvchilar"
             subColor="gray"
+            icon={icons.students}
           />
           <StatCard
             label="Oylik tushum"
             value={formatSum(stats.oylik_tushum)}
-            sub={`+bu oy`}
+            sub="bu oy"
             subColor="green"
+            icon={icons.money}
           />
           <StatCard
             label="Faol kurslar"
             value={stats.faol_kurslar}
+            subColor="gray"
+            icon={icons.courses}
           />
           <StatCard
             label="Yangi lidlar"
             value={stats.yangi_lidlar}
             sub="bu oy"
             subColor="gray"
+            icon={icons.leads}
           />
         </div>
 
         {/* Bugungi sinov darslar reminder */}
         {stats.bugungi_sinov.length > 0 && (
-          <div className="bg-purple-50 border border-purple-200 rounded-2xl px-5 py-4">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-purple-600 text-lg">🎯</span>
-              <p className="font-semibold text-purple-800">
-                Bugun {stats.bugungi_sinov.length} ta sinov darsi bor
-              </p>
+          <div className="bg-violet-50 border border-violet-200/60 rounded-2xl px-6 py-5 shadow-soft">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 bg-violet-100 rounded-xl">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-violet-600">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                </svg>
+              </div>
+              <div>
+                <p className="font-semibold text-violet-900">
+                  Bugun {stats.bugungi_sinov.length} ta sinov darsi bor
+                </p>
+                <p className="text-sm text-violet-600">Talabalarni kutib oling</p>
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {stats.bugungi_sinov.map((lid) => (
                 <div
                   key={lid.id}
-                  className="bg-white border border-purple-200 rounded-xl px-3 py-2"
+                  className="bg-white border border-violet-200 rounded-xl px-4 py-3 shadow-sm"
                 >
-                  <p className="text-sm font-medium text-gray-800">{lid.ism}</p>
-                  <p className="text-xs text-gray-400">{lid.kurs}</p>
+                  <p className="text-sm font-semibold text-foreground">{lid.ism}</p>
+                  <p className="text-xs text-muted-foreground">{lid.kurs}</p>
                 </div>
               ))}
             </div>
@@ -145,41 +187,52 @@ export default async function DashboardPage() {
 
         {/* Xavfli talabalar widget */}
         {stats.xavfli_talabalar.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4">
-            <div className="flex items-center justify-between mb-3">
-              <p className="font-semibold text-red-800">
-                ⚠ {stats.xavfli_talabalar.length} ta talaba diqqat talab qiladi
-              </p>
-              <span className="text-xs text-red-400">
-                {stats.xavfli_talabalar.filter((t) => t.daraja === "XAVFLI").length} xavfli ·{" "}
-                {stats.xavfli_talabalar.filter((t) => t.daraja === "DIQQAT").length} diqqat
-              </span>
+          <div className="bg-red-50 border border-red-200/60 rounded-2xl px-6 py-5 shadow-soft">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-red-100 rounded-xl">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-600">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-semibold text-red-900">
+                    {stats.xavfli_talabalar.length} ta talaba diqqat talab qiladi
+                  </p>
+                  <p className="text-sm text-red-600">
+                    {stats.xavfli_talabalar.filter((t) => t.daraja === "XAVFLI").length} xavfli, {" "}
+                    {stats.xavfli_talabalar.filter((t) => t.daraja === "DIQQAT").length} diqqat
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="space-y-2">
               {stats.xavfli_talabalar.slice(0, 5).map((t) => (
-                <div key={t.id} className="flex items-start justify-between bg-white border border-red-100 rounded-xl px-3 py-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        t.daraja === "XAVFLI"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-amber-100 text-amber-600"
-                      }`}>
-                        {t.daraja === "XAVFLI" ? "🔴 Xavfli" : "🟡 Diqqat"}
-                      </span>
-                      <span className="text-sm font-medium text-gray-800">
+                <div key={t.id} className="flex items-start justify-between bg-white border border-red-100 rounded-xl px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                      t.daraja === "XAVFLI"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {t.daraja === "XAVFLI" ? "Xavfli" : "Diqqat"}
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-foreground">
                         {t.ism} {t.familiya}
                       </span>
-                      <span className="text-xs text-gray-400">{t.guruhNom}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{t.guruhNom}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {t.sabablar.join(" · ")}
-                    </p>
                   </div>
+                  <p className="text-xs text-muted-foreground max-w-xs text-right">
+                    {t.sabablar.join(" | ")}
+                  </p>
                 </div>
               ))}
               {stats.xavfli_talabalar.length > 5 && (
-                <p className="text-xs text-red-400 text-center pt-1">
+                <p className="text-xs text-red-500 text-center pt-2 font-medium">
                   + {stats.xavfli_talabalar.length - 5} ta talaba yana bor
                 </p>
               )}
@@ -190,12 +243,30 @@ export default async function DashboardPage() {
         {/* Bugungi darslar */}
         <Card>
           <CardHeader>
-            <CardTitle>Bugungi darslar</CardTitle>
-            <span className="text-xs text-gray-400">{formatSana(new Date())}</span>
+            <CardTitle>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Bugungi darslar
+            </CardTitle>
+            <span className="text-sm text-muted-foreground">{formatSana(new Date())}</span>
           </CardHeader>
           {stats.bugungi_darslar.length === 0 ? (
             <CardBody>
-              <p className="text-sm text-gray-400 text-center py-4">Bugun dars yo'q</p>
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <p className="text-sm text-muted-foreground">Bugun dars yo'q</p>
+              </div>
             </CardBody>
           ) : (
             <Table>
@@ -211,11 +282,19 @@ export default async function DashboardPage() {
               <Tbody>
                 {stats.bugungi_darslar.map((dars) => (
                   <Tr key={dars.id}>
-                    <Td className="font-mono text-xs">{dars.guruh.vaqt}</Td>
-                    <Td>{dars.guruh.kurs.nom}</Td>
+                    <Td>
+                      <span className="font-mono text-xs bg-muted px-2 py-1 rounded-lg">
+                        {dars.guruh.vaqt}
+                      </span>
+                    </Td>
+                    <Td className="font-medium">{dars.guruh.kurs.nom}</Td>
                     <Td>{dars.guruh.nom}</Td>
-                    <Td>{dars.guruh.oqituvchi?.user.name ?? "—"}</Td>
-                    <Td>{dars.guruh.xona ?? "—"}</Td>
+                    <Td className="text-muted-foreground">{dars.guruh.oqituvchi?.user.name ?? "—"}</Td>
+                    <Td>
+                      {dars.guruh.xona ? (
+                        <Badge variant="gray" dot={false}>{dars.guruh.xona}</Badge>
+                      ) : "—"}
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -227,7 +306,13 @@ export default async function DashboardPage() {
           {/* Oxirgi lidlar */}
           <Card>
             <CardHeader>
-              <CardTitle>Oxirgi lidlar</CardTitle>
+              <CardTitle>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                </svg>
+                Oxirgi lidlar
+              </CardTitle>
             </CardHeader>
             <Table>
               <Thead>
@@ -242,8 +327,8 @@ export default async function DashboardPage() {
                   const h = lidHolatBadge[lid.holat];
                   return (
                     <Tr key={lid.id}>
-                      <Td>{lid.ism}</Td>
-                      <Td className="text-gray-500">{lid.kurs}</Td>
+                      <Td className="font-medium">{lid.ism}</Td>
+                      <Td className="text-muted-foreground">{lid.kurs}</Td>
                       <Td><Badge variant={h.variant}>{h.label}</Badge></Td>
                     </Tr>
                   );
@@ -255,7 +340,13 @@ export default async function DashboardPage() {
           {/* Oxirgi to'lovlar */}
           <Card>
             <CardHeader>
-              <CardTitle>Oxirgi to'lovlar</CardTitle>
+              <CardTitle>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+                Oxirgi to'lovlar
+              </CardTitle>
             </CardHeader>
             <Table>
               <Thead>
@@ -268,9 +359,13 @@ export default async function DashboardPage() {
               <Tbody>
                 {stats.oxirgi_tolovlar.map((t) => (
                   <Tr key={t.id}>
-                    <Td>{t.talaba.ism} {t.talaba.familiya}</Td>
-                    <Td className="font-medium">{t.summa.toLocaleString()}</Td>
-                    <Td className="text-gray-400 text-xs">{formatSana(t.createdAt)}</Td>
+                    <Td className="font-medium">{t.talaba.ism} {t.talaba.familiya}</Td>
+                    <Td>
+                      <span className="text-emerald-600 font-semibold">
+                        {t.summa.toLocaleString()} so'm
+                      </span>
+                    </Td>
+                    <Td className="text-muted-foreground text-sm">{formatSana(t.createdAt)}</Td>
                   </Tr>
                 ))}
               </Tbody>

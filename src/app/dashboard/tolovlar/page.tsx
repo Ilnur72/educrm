@@ -79,11 +79,11 @@ export default function TolovlarPage() {
 
       <div className="p-6 space-y-5">
         {/* Oy tanlash */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <select
             value={oy}
             onChange={(e) => setOy(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{oyNomi(i + 1)}</option>
@@ -92,11 +92,13 @@ export default function TolovlarPage() {
           <select
             value={yil}
             onChange={(e) => setYil(parseInt(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground focus:outline-none focus:border-primary transition-colors cursor-pointer"
           >
             {[2024, 2025, 2026].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
-          <span className="text-sm text-gray-500">{oyNomi(oy)} {yil}</span>
+          <div className="px-4 py-2 bg-primary/10 rounded-xl">
+            <span className="text-sm font-medium text-primary">{oyNomi(oy)} {yil}</span>
+          </div>
         </div>
 
         {/* Statistika */}
@@ -128,19 +130,27 @@ export default function TolovlarPage() {
             <Tbody>
               {tolovlar.map((t) => (
                 <Tr key={t.id}>
-                  <Td className="font-medium">{t.talaba.ism} {t.talaba.familiya}</Td>
-                  <Td className="font-mono text-xs text-gray-500">{t.talaba.telefon}</Td>
-                  <Td className="font-semibold text-gray-900">{t.summa.toLocaleString()} so'm</Td>
+                  <Td className="font-medium text-foreground">{t.talaba.ism} {t.talaba.familiya}</Td>
+                  <Td><span className="font-mono text-xs text-muted-foreground">{t.talaba.telefon}</span></Td>
+                  <Td><span className="font-semibold text-emerald-600">{t.summa.toLocaleString()} so'm</span></Td>
                   <Td><Badge variant="green">{TUR_LABEL[t.tur]}</Badge></Td>
-                  <Td className="text-gray-400">{t.izoh ?? "—"}</Td>
-                  <Td className="text-xs text-gray-400">
+                  <Td className="text-muted-foreground">{t.izoh ?? "—"}</Td>
+                  <Td className="text-sm text-muted-foreground">
                     {new Date(t.createdAt).toLocaleDateString("uz-UZ")}
                   </Td>
                 </Tr>
               ))}
               {tolovlar.length === 0 && (
                 <Tr>
-                  <Td colSpan={6} className="text-center text-gray-400 py-10">Bu oy to'lov yo'q</Td>
+                  <Td colSpan={6} className="text-center py-12">
+                    <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center mb-3">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                      </svg>
+                    </div>
+                    <p className="text-muted-foreground">Bu oy to'lov yo'q</p>
+                  </Td>
                 </Tr>
               )}
             </Tbody>
@@ -151,21 +161,21 @@ export default function TolovlarPage() {
       <Modal open={modal} onClose={() => setModal(false)} title="To'lov qo'shish">
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-medium text-gray-600 block mb-1">Talaba *</label>
+            <label className="text-sm font-medium text-foreground block mb-2">Talaba *</label>
             <input
               type="text"
               placeholder="Ism yoki telefon bilan qidiring..."
               value={talabaQidiruv}
               onChange={(e) => setTalabaQidiruv(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+              className="w-full px-4 py-2.5 text-sm border-2 border-border rounded-xl bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
             {talabalar.length > 0 && (
-              <div className="border border-gray-100 rounded-lg mt-1 divide-y max-h-40 overflow-y-auto">
+              <div className="border-2 border-border rounded-xl mt-2 divide-y divide-border max-h-40 overflow-y-auto shadow-soft">
                 {talabalar.map((t) => (
                   <button
                     key={t.id}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                      form.talabaId === t.id ? "bg-brand-50 text-brand-800 font-medium" : ""
+                    className={`w-full text-left px-4 py-3 text-sm transition-colors ${
+                      form.talabaId === t.id ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted text-foreground"
                     }`}
                     onClick={() => {
                       setForm({ ...form, talabaId: t.id });

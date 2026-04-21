@@ -108,37 +108,34 @@ export default function QarzdorlarPage() {
 
       <div className="p-6 space-y-5">
         {/* Stat kartalar */}
-        <div className="grid grid-cols-4 gap-4">
-          <Card>
-            <CardBody>
-              <p className="text-xs text-gray-500">Jami qarzdor</p>
-              <p className="text-2xl font-semibold text-gray-900 mt-1">{jami}</p>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
-              <p className="text-xs text-gray-500">Umumiy qarz</p>
-              <p className="text-2xl font-semibold text-red-600 mt-1">{formatSum(jamiQoldiq)}</p>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
-              <p className="text-xs text-gray-500">Telegram ulangan</p>
-              <p className="text-2xl font-semibold text-green-600 mt-1">{telegramBor}</p>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody>
-              <p className="text-xs text-gray-500">Telegram yo'q</p>
-              <p className="text-2xl font-semibold text-gray-400 mt-1">{telegramYoq}</p>
-            </CardBody>
-          </Card>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft">
+            <p className="text-sm font-medium text-muted-foreground">Jami qarzdor</p>
+            <p className="text-3xl font-bold text-foreground mt-2">{jami}</p>
+          </div>
+          <div className="bg-red-50 border border-red-200/60 rounded-2xl p-5 shadow-soft">
+            <p className="text-sm font-medium text-red-600">Umumiy qarz</p>
+            <p className="text-3xl font-bold text-red-600 mt-2">{formatSum(jamiQoldiq)}</p>
+          </div>
+          <div className="bg-emerald-50 border border-emerald-200/60 rounded-2xl p-5 shadow-soft">
+            <p className="text-sm font-medium text-emerald-600">Telegram ulangan</p>
+            <p className="text-3xl font-bold text-emerald-700 mt-2">{telegramBor}</p>
+          </div>
+          <div className="bg-muted/50 border border-border rounded-2xl p-5 shadow-soft">
+            <p className="text-sm font-medium text-muted-foreground">Telegram yo'q</p>
+            <p className="text-3xl font-bold text-muted-foreground mt-2">{telegramYoq}</p>
+          </div>
         </div>
 
         {/* Xabar natijasi */}
         {xabarNatija && (
-          <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-            {xabarNatija}
+          <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border border-emerald-200/60 rounded-2xl shadow-soft">
+            <div className="p-2 bg-emerald-100 rounded-xl">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-600">
+                <polyline points="20,6 9,17 4,12"/>
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-emerald-700">{xabarNatija}</p>
           </div>
         )}
 
@@ -208,30 +205,30 @@ export default function QarzdorlarPage() {
                           type="checkbox"
                           checked={tanlangan.has(q.id)}
                           onChange={() => toggleTanlash(q.id)}
-                          className="w-4 h-4 accent-brand-600 cursor-pointer"
+                          className="w-4 h-4 rounded border-2 border-border text-primary focus:ring-primary/20 cursor-pointer"
                         />
                       )}
                     </Td>
-                    <Td className="font-medium">{q.ism} {q.familiya}</Td>
+                    <Td className="font-medium text-foreground">{q.ism} {q.familiya}</Td>
                     <Td>
-                      <p className="text-sm">{q.guruhNom}</p>
-                      <p className="text-xs text-gray-400">{q.kursNom}</p>
+                      <p className="text-sm font-medium text-foreground">{q.guruhNom}</p>
+                      <p className="text-xs text-muted-foreground">{q.kursNom}</p>
                     </Td>
-                    <Td className="text-gray-500">{formatSum(q.narxi)}</Td>
+                    <Td className="text-muted-foreground">{formatSum(q.narxi)}</Td>
                     <Td>
                       {q.tolangan > 0
-                        ? <span className="text-amber-600">{formatSum(q.tolangan)}</span>
-                        : <span className="text-gray-300">—</span>
+                        ? <span className="text-amber-600 font-medium">{formatSum(q.tolangan)}</span>
+                        : <span className="text-muted-foreground/50">—</span>
                       }
                     </Td>
                     <Td>
-                      <span className="font-semibold text-red-600">{formatSum(q.qoldiq)}</span>
+                      <span className="font-bold text-red-600">{formatSum(q.qoldiq)}</span>
                     </Td>
                     <Td>
-                      <div className="text-xs font-mono">
-                        <p>{q.telefon}</p>
+                      <div className="text-xs font-mono space-y-0.5">
+                        <p className="bg-muted px-2 py-1 rounded-lg inline-block">{q.telefon}</p>
                         {q.otaTelefon && (
-                          <p className="text-gray-400">{q.otaTelefon}</p>
+                          <p className="text-muted-foreground">{q.otaTelefon}</p>
                         )}
                       </div>
                     </Td>
