@@ -14,7 +14,7 @@ export default withAuth(
 
     // O'qituvchi faqat o'z kabineti va davomatga kirishi mumkin
     if (token?.role === "OQITUVCHI") {
-      const allowed = ["/dashboard/oqituvchi", "/dashboard/davomat", "/dashboard/guruhlar", "/dashboard"];
+      const allowed = ["/dashboard/oqituvchi", "/dashboard/davomat", "/dashboard/guruhlar", "/dashboard/jadval", "/dashboard"];
       if (!allowed.some((p) => path === p || path.startsWith(p + "/"))) {
         return NextResponse.redirect(new URL("/dashboard/oqituvchi", req.url));
       }
