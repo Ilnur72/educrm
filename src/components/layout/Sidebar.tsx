@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/qarzdorlar",         icon: "◌", label: "Qarzdorlar",        roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/xabarlar",           icon: "◉", label: "Xabarlar",          roles: ["ADMIN","RECEPTION"] },
   { href: "/dashboard/oqituvchilar",       icon: "◍", label: "O'qituvchilar",     roles: ["ADMIN"] },
+  { href: "/dashboard/oqituvchilar/ish-haqi", icon: "◈", label: "Ish haqi",        roles: ["ADMIN"] },
   { href: "/hisobotlar",         icon: "◫", label: "Hisobotlar",        roles: ["ADMIN"] },
   { href: "/davomat-hisoboti",   icon: "▣", label: "Davomat hisoboti",  roles: ["ADMIN"] },
   { href: "/dashboard/xonalar",            icon: "▭", label: "Xonalar",           roles: ["ADMIN"] },

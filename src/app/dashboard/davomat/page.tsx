@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { Topbar } from "@/components/layout/Topbar";
+
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
@@ -18,10 +20,11 @@ const HOLAT_OPTIONS: { value: DavomatHolat; label: string; color: string; short:
   { value: "SABABLI",    label: "Sababli",     color: "bg-blue-100 text-blue-700",    short: "S" },
 ];
 
-export default function DavomatPage() {
+function DavomatContent() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [guruhlar, setGuruhlar] = useState<Guruh[]>([]);
-  const [guruhId, setGuruhId] = useState("");
+  const [guruhId, setGuruhId] = useState(searchParams.get("guruhId") ?? "");
   const [talabalar, setTalabalar] = useState<TalabaRow[]>([]);
   const [davomatlar, setDavomatlar] = useState<Record<string, DavomatHolat>>({});
   const [baholar, setBaholar]       = useState<Record<string, string>>({});
@@ -244,5 +247,13 @@ export default function DavomatPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DavomatPage() {
+  return (
+    <Suspense>
+      <DavomatContent />
+    </Suspense>
   );
 }

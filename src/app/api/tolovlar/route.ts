@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -23,9 +24,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
   const body = await req.json();
   const tolov = await prisma.tolov.create({
-    data: body,
+    data: { ...body, qabulQildi: session?.user?.name ?? null },
     include: {
       talaba: { select: { ism: true, familiya: true } },
     },

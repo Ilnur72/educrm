@@ -14,7 +14,7 @@ import type { TolovTur } from "@/types";
 
 type TolovRow = {
   id: string; summa: number; tur: TolovTur; oy: number; yil: number;
-  izoh: string | null; createdAt: string;
+  izoh: string | null; qabulQildi: string | null; createdAt: string;
   talaba: { id: string; ism: string; familiya: string; telefon: string };
 };
 
@@ -121,6 +121,7 @@ export default function TolovlarPage() {
                 <Th>Telefon</Th>
                 <Th>Summa</Th>
                 <Th>Tur</Th>
+                <Th>Qabul qildi</Th>
                 <Th>Izoh</Th>
                 <Th>Sana</Th>
               </tr>
@@ -132,6 +133,7 @@ export default function TolovlarPage() {
                   <Td className="font-mono text-xs text-gray-500">{t.talaba.telefon}</Td>
                   <Td className="font-semibold text-gray-900">{t.summa.toLocaleString()} so'm</Td>
                   <Td><Badge variant="green">{TUR_LABEL[t.tur]}</Badge></Td>
+                  <Td className="text-xs text-gray-600">{t.qabulQildi ?? "—"}</Td>
                   <Td className="text-gray-400">{t.izoh ?? "—"}</Td>
                   <Td className="text-xs text-gray-400">
                     {new Date(t.createdAt).toLocaleDateString("uz-UZ")}
@@ -140,7 +142,7 @@ export default function TolovlarPage() {
               ))}
               {tolovlar.length === 0 && (
                 <Tr>
-                  <Td colSpan={6} className="text-center text-gray-400 py-10">Bu oy to'lov yo'q</Td>
+                  <Td colSpan={7} className="text-center text-gray-400 py-10">Bu oy to'lov yo'q</Td>
                 </Tr>
               )}
             </Tbody>
