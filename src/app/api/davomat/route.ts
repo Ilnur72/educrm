@@ -38,12 +38,13 @@ export async function POST(req: NextRequest) {
 
   // Davomatlarni saqlash
   const result = await prisma.davomat.createMany({
-    data: (davomatlar as { talabaId: string; holat: DavomatHolat }[]).map(
+    data: (davomatlar as { talabaId: string; holat: DavomatHolat; baho?: number | null }[]).map(
       (d) => ({
         talabaId: d.talabaId,
         guruhId,
         darsId: dars.id,
         holat: d.holat,
+        baho: d.baho ?? null,
       })
     ),
   });

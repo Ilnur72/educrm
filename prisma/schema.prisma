@@ -200,6 +200,7 @@ model Davomat {
   darsId   String
   dars     Dars         @relation(fields: [darsId], references: [id])
   holat    DavomatHolat @default(KELDI)
+  baho     Int?
   izoh     String?
   createdAt DateTime    @default(now())
 

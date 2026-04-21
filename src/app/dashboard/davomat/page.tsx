@@ -24,6 +24,7 @@ export default function DavomatPage() {
   const [guruhId, setGuruhId] = useState("");
   const [talabalar, setTalabalar] = useState<TalabaRow[]>([]);
   const [davomatlar, setDavomatlar] = useState<Record<string, DavomatHolat>>({});
+  const [baholar, setBaholar]       = useState<Record<string, string>>({});
   const [sana, setSana] = useState(new Date().toISOString().split("T")[0]);
   const [mavzu, setMavzu] = useState("");
   const [saqlanmoqda, setSaqlanmoqda] = useState(false);
@@ -51,6 +52,7 @@ export default function DavomatPage() {
     const def: Record<string, DavomatHolat> = {};
     data.forEach((t) => { def[t.id] = "KELDI"; });
     setDavomatlar(def);
+    setBaholar({});
     setSaqlandi(false);
   }, [guruhId]);
 
@@ -69,7 +71,11 @@ export default function DavomatPage() {
         guruhId,
         sana,
         mavzu,
-        davomatlar: Object.entries(davomatlar).map(([talabaId, holat]) => ({ talabaId, holat })),
+        davomatlar: Object.entries(davomatlar).map(([talabaId, holat]) => ({
+          talabaId,
+          holat,
+          baho: baholar[talabaId] ? parseInt(baholar[talabaId]) : null,
+        })),
       }),
     });
     setSaqlanmoqda(false);
@@ -204,6 +210,20 @@ export default function DavomatPage() {
                         </button>
                       ))}
                     </div>
+                    {/* Ball (faqat kelganlarda) */}
+                    {(holat === "KELDI" || holat === "KECH_KELDI") ? (
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        placeholder="Ball"
+                        value={baholar[talaba.id] ?? ""}
+                        onChange={(e) => setBaholar(prev => ({ ...prev, [talaba.id]: e.target.value }))}
+                        className="w-16 px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 text-center"
+                      />
+                    ) : (
+                      <div className="w-16" />
+                    )}
                     {/* Holat badge */}
                     <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium w-24 text-center", config.color)}>
                       {config.label}

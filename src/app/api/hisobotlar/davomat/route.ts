@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
   const oyBoshi = new Date(yil, oy - 1, 1);
   const oyOxiri = new Date(yil, oy, 1);
 
-  // Guruh va talabalar
   const guruh = await prisma.guruh.findUnique({
     where: { id: guruhId },
     include: {
@@ -25,9 +24,7 @@ export async function GET(req: NextRequest) {
       talabalar: {
         where: { faol: true },
         include: {
-          talaba: {
-            select: { id: true, ism: true, familiya: true },
-          },
+          talaba: { select: { id: true, ism: true, familiya: true } },
         },
         orderBy: { talaba: { familiya: "asc" } },
       },
@@ -36,50 +33,50 @@ export async function GET(req: NextRequest) {
 
   if (!guruh) return NextResponse.json({ error: "Guruh topilmadi" }, { status: 404 });
 
-  // O'sha oy darslar
   const darslar = await prisma.dars.findMany({
     where: {
       guruhId,
       sana: { gte: oyBoshi, lt: oyOxiri },
     },
     include: {
-      davomatlar: { select: { talabaId: true, holat: true } },
+      davomatlar: { select: { talabaId: true, holat: true, baho: true } },
     },
     orderBy: { sana: "asc" },
   });
 
-  // Talabalar ro'yxati
   const talabalar = guruh.talabalar.map((tg) => {
-    const kunlar: Record<number, string> = {};
+    const kunlar: Record<number, { holat: string; baho: number | null }> = {};
     let keldi = 0, kelmadi = 0, kech = 0, sababli = 0;
+    const baholar: number[] = [];
 
     for (const dars of darslar) {
-      const kun   = new Date(dars.sana).getDate();
-      const dvmt  = dars.davomatlar.find((d) => d.talabaId === tg.talaba.id);
-      const holat = dvmt?.holat ?? null;
-      if (holat) {
-        kunlar[kun] = holat;
-        if (holat === "KELDI")      keldi++;
+      const kun  = new Date(dars.sana).getDate();
+      const dvmt = dars.davomatlar.find((d) => d.talabaId === tg.talaba.id);
+      if (dvmt) {
+        const holat = dvmt.holat;
+        kunlar[kun] = { holat, baho: dvmt.baho ?? null };
+        if (holat === "KELDI")      { keldi++;   if (dvmt.baho !== null) baholar.push(dvmt.baho); }
         if (holat === "KELMADI")    kelmadi++;
-        if (holat === "KECH_KELDI") kech++;
+        if (holat === "KECH_KELDI") { kech++;    if (dvmt.baho !== null) baholar.push(dvmt.baho); }
         if (holat === "SABABLI")    sababli++;
       }
     }
 
-    const jami  = keldi + kelmadi + kech + sababli;
-    const foiz  = jami > 0 ? Math.round(((keldi + kech) / jami) * 100) : null;
+    const ortachaBaho = baholar.length > 0
+      ? Math.round((baholar.reduce((a, b) => a + b, 0) / baholar.length) * 10) / 10
+      : null;
 
     return {
-      id:       tg.talaba.id,
-      ism:      tg.talaba.ism,
-      familiya: tg.talaba.familiya,
-      kunlar,
-      keldi, kelmadi, kech, sababli, foiz,
+      id: tg.talaba.id, ism: tg.talaba.ism, familiya: tg.talaba.familiya,
+      kunlar, keldi, kelmadi, kech, sababli, ortachaBaho,
     };
   });
 
-  // Dars kunlari (sanalar)
-  const sanalar = darslar.map((d) => new Date(d.sana).getDate());
+  // Sanalar: kun raqami + hafta kuni (0=Ya, 1=Du, ..., 6=Sh)
+  const sanalar = darslar.map((d) => ({
+    kun:   new Date(d.sana).getDate(),
+    hafta: new Date(d.sana).getDay(),
+  }));
 
   return NextResponse.json({
     guruhNom: guruh.nom,
