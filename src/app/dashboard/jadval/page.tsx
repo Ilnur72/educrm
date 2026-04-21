@@ -62,7 +62,7 @@ export default function JadvalPage() {
         title="Dars jadvali"
         actions={
           <button
-            onClick={() => router.push("/dashboard/guruhlar")}
+            onClick={() => router.push("/dashboard/kurslar")}
             className="px-4 py-2 text-sm font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
           >
             + Guruh qo'shish
