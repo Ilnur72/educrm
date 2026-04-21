@@ -50,7 +50,9 @@ export default function JadvalPage() {
   const bugunKod = ["Ya","Du","Se","Ch","Pa","Ju","Sha"][new Date().getDay()];
 
   const kunGuruhlar = (kod: string) =>
-    guruhlar.filter((g) => g.kunlar.includes(kod)).sort(vaqtSort);
+    guruhlar
+      .filter((g) => g.kunlar.some((k) => k.toLowerCase() === kod.toLowerCase()))
+      .sort(vaqtSort);
 
   const jami = guruhlar.length;
 
