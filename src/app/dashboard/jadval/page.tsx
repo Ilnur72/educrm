@@ -58,17 +58,7 @@ export default function JadvalPage() {
 
   return (
     <div>
-      <Topbar
-        title="Dars jadvali"
-        actions={
-          <button
-            onClick={() => router.push("/dashboard/kurslar")}
-            className="px-4 py-2 text-sm font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
-          >
-            + Guruh qo'shish
-          </button>
-        }
-      />
+      <Topbar title="Dars jadvali" />
 
       <div className="p-6 space-y-4">
         <p className="text-sm text-gray-400">Jami: {jami} ta jadval</p>
