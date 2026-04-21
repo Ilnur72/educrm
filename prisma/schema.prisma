@@ -43,6 +43,7 @@ model Lid {
   izoh            String?
   keyingiQongiroq DateTime?
   sinovSanasi     DateTime?
+  sinovGuruhId    String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

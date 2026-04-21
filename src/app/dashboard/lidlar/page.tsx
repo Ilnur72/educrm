@@ -23,7 +23,7 @@ type TavsiyaGuruh = {
 type LidRow = {
   id: string; ism: string; telefon: string; kurs: string;
   manba: LidManba; holat: LidHolat; createdAt: string;
-  sinovSanasi: string | null;
+  sinovSanasi: string | null; sinovGuruhId: string | null;
   talaba: {
     id: string; ism: string; familiya: string;
     guruhlar: { guruh: { nom: string; kurs: { nom: string } } }[];
@@ -67,6 +67,13 @@ export default function LidlarPage() {
   const [form, setForm]               = useState({ ism: "", telefon: "", kurs: "", manba: "INSTAGRAM", izoh: "" });
   const [saqlanyapti, setSaqlanyapti] = useState(false);
 
+  // Sinov darsi modal
+  const [sinovModal, setSinovModal]           = useState(false);
+  const [sinovLid, setSinovLid]               = useState<LidRow | null>(null);
+  const [sinovSana, setSinovSana]             = useState("");
+  const [sinovGuruhId, setSinovGuruhId]       = useState("");
+  const [sinovSaqlanmoqda, setSinovSaqlanmoqda] = useState(false);
+
   // Talabaga yozish modal
   const [yozishModal, setYozishModal]         = useState(false);
   const [yozishLid, setYozishLid]             = useState<LidRow | null>(null);
@@ -100,6 +107,23 @@ export default function LidlarPage() {
   }, {} as Record<string, number>);
 
   const yangilash = async (id: string, holat: LidHolat) => {
+    if (holat === "SINOV_DARSI") {
+      const lid = lidlar.find(l => l.id === id);
+      if (lid) {
+        setSinovLid(lid);
+        setSinovSana(lid.sinovSanasi?.slice(0, 10) ?? "");
+        setSinovGuruhId(lid.sinovGuruhId ?? "");
+        setSinovModal(true);
+        // Holatni avval SINOV_DARSI ga o'tkazamiz
+        await fetch(`/api/lidlar/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ holat }),
+        });
+        fetchLidlar();
+        return;
+      }
+    }
     await fetch(`/api/lidlar/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -108,12 +132,19 @@ export default function LidlarPage() {
     fetchLidlar();
   };
 
-  const sinovSanasiniYangilash = async (id: string, sana: string) => {
-    await fetch(`/api/lidlar/${id}`, {
+  const sinovSaqlash = async () => {
+    if (!sinovLid) return;
+    setSinovSaqlanmoqda(true);
+    await fetch(`/api/lidlar/${sinovLid.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sinovSanasi: sana ? new Date(sana).toISOString() : null }),
+      body: JSON.stringify({
+        sinovSanasi: sinovSana ? new Date(sinovSana).toISOString() : null,
+        sinovGuruhId: sinovGuruhId || null,
+      }),
     });
+    setSinovSaqlanmoqda(false);
+    setSinovModal(false);
     fetchLidlar();
   };
 
@@ -255,12 +286,25 @@ export default function LidlarPage() {
                     <Td className="text-gray-500">{MANBA_LABEL[lid.manba as LidManba]}</Td>
                     <Td className="text-xs text-gray-400">
                       {lid.holat === "SINOV_DARSI" ? (
-                        <input
-                          type="date"
-                          value={lid.sinovSanasi ? lid.sinovSanasi.slice(0, 10) : ""}
-                          onChange={(e) => sinovSanasiniYangilash(lid.id, e.target.value)}
-                          className="text-xs border border-purple-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-purple-50 text-purple-700"
-                        />
+                        <button
+                          onClick={() => {
+                            setSinovLid(lid);
+                            setSinovSana(lid.sinovSanasi?.slice(0, 10) ?? "");
+                            setSinovGuruhId(lid.sinovGuruhId ?? "");
+                            setSinovModal(true);
+                          }}
+                          className="text-left"
+                        >
+                          {lid.sinovSanasi ? (
+                            <span className="text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 font-medium">
+                              {new Date(lid.sinovSanasi).toLocaleDateString("uz-UZ")}
+                            </span>
+                          ) : (
+                            <span className="text-purple-400 border border-dashed border-purple-300 rounded-lg px-2 py-1">
+                              + Sana tanlang
+                            </span>
+                          )}
+                        </button>
                       ) : (
                         formatSana(lid.createdAt)
                       )}
@@ -399,6 +443,39 @@ export default function LidlarPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Sinov darsi bron modal */}
+      <Modal open={sinovModal} onClose={() => setSinovModal(false)}
+        title={`Sinov darsi — ${sinovLid?.ism}`}>
+        <div className="space-y-4">
+          <div className="p-3 bg-purple-50 rounded-xl text-sm text-purple-700">
+            Sinov darsi sanasi va guruhini belgilang
+          </div>
+          <Input
+            label="Sinov darsi sanasi *"
+            type="date"
+            value={sinovSana}
+            onChange={e => setSinovSana(e.target.value)}
+          />
+          <Select
+            label="Guruh (ixtiyoriy)"
+            value={sinovGuruhId}
+            onChange={e => setSinovGuruhId(e.target.value)}
+          >
+            <option value="">— Guruh tanlang —</option>
+            {guruhlar.map(g => (
+              <option key={g.id} value={g.id}>{g.kurs.nom} — {g.nom}</option>
+            ))}
+          </Select>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" onClick={() => setSinovModal(false)}>Bekor</Button>
+            <Button variant="primary" onClick={sinovSaqlash}
+              disabled={!sinovSana || sinovSaqlanmoqda}>
+              {sinovSaqlanmoqda ? "Saqlanmoqda..." : "Saqlash"}
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       {/* Yangi lid modali */}
