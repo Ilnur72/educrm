@@ -23,19 +23,29 @@ export async function GET(req: NextRequest) {
   const oyBoshi = new Date(yil, oy - 1, 1);
   const oyOxiri = new Date(yil, oy, 1);
 
-  const guruh = await prisma.guruh.findUnique({
-    where: { id: guruhId },
-    include: {
-      kurs: { select: { nom: true } },
-      talabalar: {
-        where: { faol: true },
-        include: {
-          talaba: { select: { id: true, ism: true, familiya: true } },
+  // Guruh va darslarni parallel olish
+  const [guruh, darslar] = await Promise.all([
+    prisma.guruh.findUnique({
+      where: { id: guruhId },
+      include: {
+        kurs: { select: { nom: true } },
+        talabalar: {
+          where: { faol: true },
+          include: {
+            talaba: { select: { id: true, ism: true, familiya: true } },
+          },
+          orderBy: { talaba: { familiya: "asc" } },
         },
-        orderBy: { talaba: { familiya: "asc" } },
       },
-    },
-  });
+    }),
+    prisma.dars.findMany({
+      where: { guruhId, sana: { gte: oyBoshi, lt: oyOxiri } },
+      include: {
+        davomatlar: { select: { talabaId: true, holat: true, baho: true } },
+      },
+      orderBy: { sana: "asc" },
+    }),
+  ]);
 
   if (!guruh) return NextResponse.json({ error: "Guruh topilmadi" }, { status: 404 });
 
@@ -53,18 +63,6 @@ export async function GET(req: NextRequest) {
     }
     iter.setDate(iter.getDate() + 1);
   }
-
-  // O'sha oy uchun haqiqiy dars yozuvlarini olish
-  const darslar = await prisma.dars.findMany({
-    where: {
-      guruhId,
-      sana: { gte: oyBoshi, lt: oyOxiri },
-    },
-    include: {
-      davomatlar: { select: { talabaId: true, holat: true, baho: true } },
-    },
-    orderBy: { sana: "asc" },
-  });
 
   // Kun raqami → dars yozuvi xaritasi
   const darsMap = new Map<number, typeof darslar[0]>();

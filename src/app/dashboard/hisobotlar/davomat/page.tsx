@@ -99,17 +99,21 @@ export default function DavomatHisobotiPage() {
   const [yukl, setYukl]         = useState(false);
 
   useEffect(() => {
-    fetch("/api/guruhlar?faol=true")
+    const ac = new AbortController();
+    fetch("/api/guruhlar?faol=true", { signal: ac.signal })
       .then(r => r.json()).then(setGuruhlar).catch(() => {});
+    return () => ac.abort();
   }, []);
 
   useEffect(() => {
     if (!guruhId) return;
+    const ac = new AbortController();
     setYukl(true); setData(null);
-    fetch(`/api/hisobotlar/davomat?guruhId=${guruhId}&oy=${oy}&yil=${yil}`)
+    fetch(`/api/hisobotlar/davomat?guruhId=${guruhId}&oy=${oy}&yil=${yil}`, { signal: ac.signal })
       .then(r => r.json())
       .then(d => { setData(d); setYukl(false); })
       .catch(() => setYukl(false));
+    return () => ac.abort();
   }, [guruhId, oy, yil]);
 
   return (

@@ -11,15 +11,21 @@ export async function GET(req: NextRequest) {
       ...(kursId && { kursId }),
       ...(faol !== null && { faol: faol === "true" }),
     },
-    include: {
-      kurs: true,
-      oqituvchi: { include: { user: { select: { name: true } } } },
+    select: {
+      id: true, nom: true, vaqt: true, xona: true, kunlar: true,
+      boshlanish: true, tugash: true, faol: true, createdAt: true,
+      kursId: true,
+      kurs: { select: { id: true, nom: true, narxi: true, davomiyligi: true, maxTalaba: true } },
+      oqituvchiId: true,
+      oqituvchi: { select: { id: true, user: { select: { name: true } } } },
       _count: { select: { talabalar: { where: { faol: true } } } },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(guruhlar);
+  return NextResponse.json(guruhlar, {
+    headers: { "Cache-Control": "s-maxage=30, stale-while-revalidate=60" },
+  });
 }
 
 export async function POST(req: NextRequest) {
