@@ -1,7 +1,7 @@
 import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db/index";
 import { Role } from "@prisma/client";
 
 declare module "next-auth" {
