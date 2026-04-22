@@ -1,56 +1,121 @@
-# EduCRM — Kelajak rejalari
+# EduCRM — Keyingi bosqich rejalari
 
-## Bajarilgan ishlar ✅
-
-### Asosiy funksiyalar
-- [x] Lidlar + funnel (YANGI → YOZILDI)
-- [x] Liddan talabaga o'tkazish (guruh tanlash bilan)
-- [x] Talabalar CRUD + profil sahifasi + edit
-- [x] Kurslar + guruhlar CRUD
-- [x] Davomat belgilash
-- [x] To'lovlar
-- [x] O'qituvchilar + ish haqi
-- [x] Xonalar CRUD
-- [x] Xona vaqt konflikti tekshiruvi
-
-### Qo'shimcha funksiyalar
-- [x] Qarzdorlar jadvali (bir tugmada Telegram xabar)
-- [x] Telegram bot (ota-ona ulash, davomat + to'lov xabarnomasi)
-- [x] To'lov eslatmasi — har oyning 1-si cron (Vercel)
-- [x] Sinov darsi treker — lid statusida sana, dashboard reminder
-- [x] Davomat trend grafigi — talaba profilida 12 haftalik grafik (Recharts)
-- [x] Guruh to'ldirish ogohlantirish — 80%+ sariq, to'lgan qizil
-- [x] O'qituvchi shaxsiy kabineti — faqat o'z guruhlari, ish haqi tarixi
-- [x] Talaba xavf tahlili (churn prediction) — dashboard widget + talabalar jadvalida belgi + Telegram ogohlantirish
-- [x] Guruh tavsiyasi — lid kursiga mos guruhlar avtomatik taklif (ball tizimi)
-- [x] O'qituvchi samaradorligi hisoboti — davomat %, to'lov foizi, reyting
-- [x] Oylik PDF hisobot — tushum, davomat, lidlar, guruhlar; oy/yil filtri + print
-- [x] Loyiha hujjati (LOYIHA.md) — proyekt menejeri uchun
+> MVP 2026-04-22 da yakunlandi. Quyidagilar v2.0 uchun.
 
 ---
 
-## Qolgan ishlar
+## ✅ MVP — Tayyor (v1.0)
 
-### 💬 Ota-ona portal — Telegram orqali (O'rta muhimlik)
-- [x] Ota-ona `/jadval` buyrug'i → farzandining haftalik dars jadvali
-- [x] Dars bekor qilinsa → barcha ota-onalarga avtomatik Telegram xabar
-- [x] Ota-ona `To'lov qildim` tugmasi → admin tasdiqlaydi → bazaga tushadi
+| Modul | URL |
+|-------|-----|
+| Dashboard | `/dashboard` |
+| Lidlar + sinov darsi bron | `/dashboard/lidlar` |
+| Talabalar + detail | `/dashboard/talabalar` |
+| Kurslar + guruhlar CRUD | `/dashboard/kurslar` |
+| Guruhlar ro'yxati | `/dashboard/guruhlar` |
+| Davomat belgilash + ball | `/dashboard/davomat` |
+| To'lovlar + qabulQildi | `/dashboard/tolovlar` |
+| Dars jadvali | `/dashboard/jadval` |
+| Qarzdorlar | `/dashboard/qarzdorlar` |
+| Xabarlar (Telegram) | `/dashboard/xabarlar` |
+| O'qituvchilar + samaradorlik | `/dashboard/oqituvchilar` |
+| Ish haqi hisoblash | `/dashboard/oqituvchilar/ish-haqi` |
+| Oylik hisobot | `/hisobotlar` |
+| Davomat hisoboti | `/davomat-hisoboti` |
+| Xonalar | `/dashboard/xonalar` |
+| Foydalanuvchilar | `/dashboard/foydalanuvchilar` |
+| O'qituvchi kabineti | `/dashboard/oqituvchi` |
+| Telegram bot (ota-ona portal) | `/jadval`, `/tolov` |
+| Deploy: Vercel + Neon.tech | — |
 
-### 📅 Aqlli jadval (O'rta muhimlik)
-- [ ] Dars jadvali kalendar ko'rinishida (haftalik/oylik view)
-- [ ] O'qituvchi ta'til kunini belgilasa — o'sha kun dars avtomatik o'tkaziladi
+---
 
-### 🎯 Gamifikatsiya (Past muhimlik)
-- [ ] Talabaga "30 kun uzluksiz keldi" badge
-- [ ] Guruh ichida davomiylik reytingi (top 3 talaba)
+## 🔜 V2.0 — Keyingi bosqich
 
-### 💰 Onlayn to'lov (Keyinchalik)
-- [ ] Click/Payme webhook — to'lov avtomatik bazaga tushadi
-- [ ] To'lov tasdiqlanganda ota-onaga Telegram xabar
+### 1. Moliya moduli (Xarajatlar)
+**Muhimlik: Yuqori**
 
-### 🚀 Deploy (Loyiha tayyor bo'lgach)
-- [ ] Vercel ga chiqarish
-- [ ] `.env` o'zgaruvchilarini Vercel dashboard da sozlash
-- [ ] `TELEGRAM_ADMIN_CHAT_ID` ni to'ldirish
-- [ ] Telegram webhook ni production URL ga o'rnatish
-- [ ] `NEXTAUTH_URL` ni production URL ga yangilash
+Hozir faqat kirim (to'lovlar) hisoblanadi. Chiqim yo'q.
+
+- [ ] `Xarajat` modeli: `tur` (ijara/kommunal/reklama/boshqa), `summa`, `sana`, `izoh`
+- [ ] `/dashboard/xarajatlar` sahifasi — CRUD
+- [ ] `/hisobotlar` ga oylik P&L: `Daromad − Xarajat = Foyda`
+- [ ] Xarajat turlar diagrammasi (pie chart)
+
+---
+
+### 2. Dashboard grafiklari
+**Muhimlik: Yuqori**
+
+Hozir faqat raqamlar, grafik yo'q. `recharts` bilan:
+
+- [ ] Oylik daromad — line/bar chart (12 oy)
+- [ ] Talabalar soni o'sishi — area chart
+- [ ] Lid konversiya funnel — stacked bar
+- [ ] Davomat dinamikasi — guruh bo'yicha
+
+---
+
+### 3. Avtomatik Telegram xabarlar (Cron)
+**Muhimlik: O'rta**
+
+- [ ] **Sinov darsi eslatmasi** — sinov kuni −1 da ota-onaga xabar
+- [ ] **To'lov eslatmasi** — har oyning 25-unda qarzdorlarga Telegram
+- [ ] **Tug'ilgan kun tabriki** — `tugilganKun` maydoni bo'yicha
+- [ ] Vercel Cron yoki Upstash QStash
+
+---
+
+### 4. O'quvchi / Ota-ona veb portal
+**Muhimlik: O'rta**
+
+Hozir Telegram bot bor. Veb portal qo'shimcha:
+
+- [ ] `/portal` route — telefon bilan login (OTP)
+- [ ] O'z davomati (oylik grid, ballar)
+- [ ] To'lov holati va tarixi
+- [ ] Dars jadvali
+
+---
+
+### 5. Import / Export
+**Muhimlik: Past**
+
+- [ ] Excel import — talabalar ro'yxatini yuklash
+- [ ] Excel export — davomat hisoboti, to'lovlar
+- [ ] `xlsx` kutubxonasi
+
+---
+
+### 6. Bildirishnomalar markazi
+**Muhimlik: Past**
+
+- [ ] In-app notification — yangi lid, to'lov o'tdi
+- [ ] Bell icon + dropdown sidebar da
+
+---
+
+### 7. Ko'p filial (Multi-branch)
+**Muhimlik: Kelajak**
+
+- [ ] `Filial` modeli
+- [ ] Har bir user bitta filialga bog'liq
+- [ ] Superadmin — barcha filiallarni ko'radi
+
+---
+
+## 🐛 Kichik tuzatishlar
+
+- [ ] Guruh detail da talabani guruhdan chiqarish
+- [ ] To'lovni o'chirish imkoni (noto'g'ri kiritilgan)
+- [ ] Lid jadvalida `sinovGuruhId` dan guruh nomini ko'rsatish
+- [ ] Mobile responsive (hozir desktop uchun)
+
+---
+
+## 📦 Texnik qarz
+
+- [ ] React Query / SWR — caching
+- [ ] Error boundary
+- [ ] Prisma migrations (`db push` o'rniga)
+- [ ] Unit testlar
