@@ -6,6 +6,18 @@ export default withAuth(
     const token = req.nextauth.token;
     const path  = req.nextUrl.pathname;
 
+    // Portal — faqat TALABA roli
+    if (path.startsWith("/portal") && path !== "/portal/login") {
+      if (token?.role !== "TALABA") {
+        return NextResponse.redirect(new URL("/portal/login", req.url));
+      }
+    }
+
+    // Dashboard — TALABA kira olmaydi
+    if (path.startsWith("/dashboard") && token?.role === "TALABA") {
+      return NextResponse.redirect(new URL("/portal", req.url));
+    }
+
     // Faqat ADMIN ko'rishi mumkin bo'lgan sahifalar
     const adminOnly = ["/dashboard/oqituvchilar", "/dashboard/hisobotlar", "/hisobotlar", "/davomat-hisoboti"];
     if (adminOnly.some((p) => path.startsWith(p)) && token?.role !== "ADMIN") {
@@ -24,11 +36,24 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        const path = req.nextUrl.pathname;
+        // Portal sahifalari — authorized callbackdan o'tkazamiz,
+        // middleware funksiyasi o'zi redirect qiladi
+        if (path.startsWith("/portal")) return true;
+        // Boshqa himoyalangan sahifalar token talab qiladi
+        return !!token;
+      },
     },
   }
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/hisobotlar", "/davomat-hisoboti"],
+  matcher: [
+    "/dashboard/:path*",
+    "/hisobotlar",
+    "/davomat-hisoboti",
+    "/portal",
+    "/portal/:path*",
+  ],
 };

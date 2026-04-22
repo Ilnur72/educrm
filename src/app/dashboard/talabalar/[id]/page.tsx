@@ -56,6 +56,7 @@ type Talaba = {
   manzil: string | null;
   izoh: string | null;
   faol: boolean;
+  login: string | null;
   createdAt: string;
   guruhlar: Guruh[];
   tolovlar: Tolov[];
@@ -93,6 +94,12 @@ export default function TalabaProfilPage() {
   const [yuklanyapti, setYuklanyapti] = useState(true);
   const [topTab, setTopTab]         = useState<"tolovlar" | "davomat">("tolovlar");
 
+  // Portal parol modal
+  const [parolModal, setParolModal]       = useState(false);
+  const [yangiParol, setYangiParol]       = useState("");
+  const [parolSaqlanmoqda, setParolSaqlanmoqda] = useState(false);
+  const [parolNatija, setParolNatija]     = useState<{ login: string } | null>(null);
+
   // Edit modal
   const [editModal, setEditModal]       = useState(false);
   const [editForm, setEditForm]         = useState({
@@ -122,6 +129,22 @@ export default function TalabaProfilPage() {
       izoh:        talaba.izoh        ?? "",
     });
     setEditModal(true);
+  };
+
+  const parolSaqlash = async () => {
+    if (!talaba || !yangiParol) return;
+    setParolSaqlanmoqda(true);
+    const res = await fetch("/api/talabalar/parol", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ talabaId: talaba.id, parol: yangiParol }),
+    });
+    setParolSaqlanmoqda(false);
+    if (res.ok) {
+      const data = await res.json();
+      setParolNatija(data);
+      fetchTalaba();
+    }
   };
 
   const editSaqlash = async () => {
@@ -232,6 +255,32 @@ export default function TalabaProfilPage() {
                   value={talaba.tugilganKun ? formatSana(talaba.tugilganKun) : null}
                 />
                 <InfoRow label="Ro'yxatga olingan" value={formatSana(talaba.createdAt)} />
+
+                {/* Portal kirish */}
+                <div className="pt-3 border-t border-gray-100">
+                  <p className="text-xs text-gray-400 mb-2">O'quvchi kabineti</p>
+                  {talaba.login ? (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-green-600 font-medium">✅ Faol</p>
+                        <p className="text-xs text-gray-400 font-mono">{talaba.login}</p>
+                      </div>
+                      <button
+                        onClick={() => { setParolModal(true); setParolNatija(null); setYangiParol(""); }}
+                        className="text-xs text-brand-600 hover:underline"
+                      >
+                        Parol o'zgartirish
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => { setParolModal(true); setParolNatija(null); setYangiParol(""); }}
+                      className="w-full py-1.5 px-3 text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors"
+                    >
+                      + Portal kirish yaratish
+                    </button>
+                  )}
+                </div>
 
                 {/* Telegram ulash */}
                 <div className="pt-3 border-t border-gray-100">
@@ -412,6 +461,47 @@ export default function TalabaProfilPage() {
           )}
         </Card>
       </div>
+
+      {/* Parol modal */}
+      <Modal open={parolModal} onClose={() => setParolModal(false)} title="Portal kirish yaratish">
+        <div className="space-y-4">
+          {parolNatija ? (
+            <div className="space-y-3">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm font-medium text-green-700 mb-2">Muvaffaqiyatli saqlandi!</p>
+                <p className="text-xs text-gray-600">Login: <span className="font-mono font-semibold">{parolNatija.login}</span></p>
+                <p className="text-xs text-gray-400 mt-1">Parolni talabaga yetkazing</p>
+              </div>
+              <div className="flex justify-end">
+                <Button variant="primary" onClick={() => setParolModal(false)}>Yopish</Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-500">
+                Login avtomatik talabaning telefon raqami bo'ladi
+              </div>
+              <Input
+                label="Yangi parol *"
+                type="text"
+                placeholder="kamida 6 ta belgi"
+                value={yangiParol}
+                onChange={(e) => setYangiParol(e.target.value)}
+              />
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="ghost" onClick={() => setParolModal(false)}>Bekor</Button>
+                <Button
+                  variant="primary"
+                  onClick={parolSaqlash}
+                  disabled={yangiParol.length < 6 || parolSaqlanmoqda}
+                >
+                  {parolSaqlanmoqda ? "Saqlanmoqda..." : "Saqlash"}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
 
       {/* Edit modal */}
       <Modal open={editModal} onClose={() => setEditModal(false)} title="Talaba ma'lumotlarini tahrirlash">

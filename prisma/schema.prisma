@@ -151,6 +151,8 @@ model Talaba {
   manzil          String?
   izoh            String?
   faol            Boolean   @default(true)
+  login           String?   @unique  // Portal uchun login (telefon yoki custom)
+  parolHash       String?            // bcrypt hash
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
