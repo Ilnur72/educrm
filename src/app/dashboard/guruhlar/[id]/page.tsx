@@ -64,11 +64,23 @@ function Avatar({ ism, familiya }: { ism: string; familiya: string }) {
   );
 }
 
+type TalabaSearch = { id: string; ism: string; familiya: string; telefon: string };
+
 export default function GuruhDetailPage() {
   const { id }  = useParams<{ id: string }>();
   const router  = useRouter();
   const [guruh, setGuruh]           = useState<Guruh | null>(null);
   const [yuklanyapti, setYuklanyapti] = useState(true);
+
+  // Talaba qo'shish modal
+  const [qoshModal, setQoshModal]     = useState(false);
+  const [qidiruv, setQidiruv]         = useState("");
+  const [natijalar, setNatijalar]     = useState<TalabaSearch[]>([]);
+  const [qoshilmoqda, setQoshilmoqda] = useState(false);
+
+  // Talabani chiqarish
+  const [chiqarModal, setChiqarModal]   = useState(false);
+  const [chiqarTalaba, setChiqarTalaba] = useState<TalabaGuruh | null>(null);
 
   // Dars bekor qilish
   const [bekorModal, setBekorModal]   = useState(false);
@@ -77,12 +89,46 @@ export default function GuruhDetailPage() {
   const [bekorYuborilmoqda, setBekorYuborilmoqda] = useState(false);
   const [bekorNatija, setBekorNatija] = useState<{ jami: number; yuborildi: number } | null>(null);
 
-  useEffect(() => {
+  const fetchGuruh = () => {
     fetch(`/api/guruhlar/${id}`)
       .then((r) => r.json())
       .then((d) => { setGuruh(d); setYuklanyapti(false); })
       .catch(() => setYuklanyapti(false));
-  }, [id]);
+  };
+
+  useEffect(() => { fetchGuruh(); }, [id]);
+
+  useEffect(() => {
+    if (!qidiruv) { setNatijalar([]); return; }
+    fetch(`/api/talabalar?search=${qidiruv}&faol=true`)
+      .then((r) => r.json())
+      .then(setNatijalar);
+  }, [qidiruv]);
+
+  const talabaQosh = async (talabaId: string) => {
+    setQoshilmoqda(true);
+    await fetch(`/api/guruhlar/${id}/talabalar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ talabaId }),
+    });
+    setQoshilmoqda(false);
+    setQoshModal(false);
+    setQidiruv("");
+    fetchGuruh();
+  };
+
+  const talabaChiqar = async () => {
+    if (!chiqarTalaba) return;
+    await fetch(`/api/guruhlar/${id}/talabalar`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ talabaId: chiqarTalaba.talaba.id }),
+    });
+    setChiqarModal(false);
+    setChiqarTalaba(null);
+    fetchGuruh();
+  };
 
   if (yuklanyapti) return (
     <div><Topbar title="Yuklanmoqda..." /><div className="p-6 text-center text-gray-400 py-20">Yuklanmoqda...</div></div>
@@ -104,6 +150,9 @@ export default function GuruhDetailPage() {
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => { setBekorSana(new Date().toISOString().slice(0, 10)); setBekorSabab(""); setBekorNatija(null); setBekorModal(true); }}>
               ❌ Dars bekor
+            </Button>
+            <Button variant="primary" onClick={() => { setQoshModal(true); setQidiruv(""); }}>
+              + Talaba qo'shish
             </Button>
             <Button variant="ghost" onClick={() => router.back()}>← Orqaga</Button>
           </div>
@@ -163,6 +212,7 @@ export default function GuruhDetailPage() {
                     <Th>Telefon</Th>
                     <Th>Bu oy to'lov</Th>
                     <Th>Holat</Th>
+                    <Th></Th>
                   </tr>
                 </Thead>
                 <Tbody>
@@ -186,6 +236,14 @@ export default function GuruhDetailPage() {
                           {summa > 0 ? formatSum(summa) : "—"}
                         </Td>
                         <Td><Badge variant={holat.variant}>{holat.label}</Badge></Td>
+                        <Td>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setChiqarTalaba(tg); setChiqarModal(true); }}
+                            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            Chiqarish
+                          </button>
+                        </Td>
                       </Tr>
                     );
                   })}
@@ -243,6 +301,61 @@ export default function GuruhDetailPage() {
           )}
         </Card>
       </div>
+
+      {/* Talaba qo'shish modali */}
+      <Modal open={qoshModal} onClose={() => { setQoshModal(false); setQidiruv(""); }} title="Talaba qo'shish">
+        <div className="space-y-3">
+          <input
+            type="text"
+            placeholder="Ism yoki telefon bilan qidiring..."
+            value={qidiruv}
+            onChange={(e) => setQidiruv(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+            autoFocus
+          />
+          {natijalar.length > 0 && (
+            <div className="border border-gray-100 rounded-lg divide-y max-h-60 overflow-y-auto">
+              {natijalar.map((t) => {
+                const allaqachon = guruh?.talabalar.some((tg) => tg.talaba.id === t.id);
+                return (
+                  <button
+                    key={t.id}
+                    disabled={allaqachon || qoshilmoqda}
+                    onClick={() => talabaQosh(t.id)}
+                    className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${
+                      allaqachon ? "text-gray-300 cursor-not-allowed" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <span className="font-medium">{t.ism} {t.familiya}</span>
+                    <span className="text-gray-400 ml-2 text-xs font-mono">{t.telefon}</span>
+                    {allaqachon && <span className="text-xs text-gray-300 ml-2">— allaqachon guruhda</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {qidiruv && natijalar.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-3">Talaba topilmadi</p>
+          )}
+        </div>
+      </Modal>
+
+      {/* Talabani chiqarish modali */}
+      <Modal open={chiqarModal} onClose={() => setChiqarModal(false)} title="Talabani chiqarish">
+        {chiqarTalaba && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">{chiqarTalaba.talaba.ism} {chiqarTalaba.talaba.familiya}</span>ni{" "}
+              <span className="font-semibold">{guruh?.nom}</span> guruhidan chiqarasizmi?
+            </p>
+            <p className="text-xs text-gray-400">Davomat va to'lov tarixi saqlanib qoladi.</p>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setChiqarModal(false)}>Bekor</Button>
+              <Button variant="danger" onClick={talabaChiqar}>Ha, chiqarish</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Dars bekor qilish modali */}
       <Modal open={bekorModal} onClose={() => setBekorModal(false)} title="Dars bekor qilish">

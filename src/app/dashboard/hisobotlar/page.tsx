@@ -13,6 +13,13 @@ type GuruhStat = {
 
 type LidManba = { manba: string; _count: number };
 
+type XarajatTur = "IJARA" | "KOMMUNAL" | "REKLAMA" | "MAOSH" | "JIHOZLAR" | "BOSHQA";
+type Xarajat = { id: string; tur: XarajatTur; summa: number; sana: string; izoh: string | null };
+const XARAJAT_TUR_LABEL: Record<XarajatTur, string> = {
+  IJARA: "Ijara", KOMMUNAL: "Kommunal", REKLAMA: "Reklama",
+  MAOSH: "Maosh", JIHOZLAR: "Jihozlar", BOSHQA: "Boshqa",
+};
+
 type Hisobot = {
   oy: number; yil: number;
   jamilTushum: number; tolovSoni: number;
@@ -38,16 +45,21 @@ export default function HisobotlarPage() {
   const hozir = new Date();
   const [oy,  setOy]  = useState(hozir.getMonth() + 1);
   const [yil, setYil] = useState(hozir.getFullYear());
-  const [data, setData]   = useState<Hisobot | null>(null);
-  const [yukl, setYukl]   = useState(true);
+  const [data, setData]           = useState<Hisobot | null>(null);
+  const [xarajatlar, setXarajatlar] = useState<Xarajat[]>([]);
+  const [yukl, setYukl]           = useState(true);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setYukl(true);
-    fetch(`/api/hisobotlar/oylik?oy=${oy}&yil=${yil}`)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setYukl(false); })
-      .catch(() => setYukl(false));
+    Promise.all([
+      fetch(`/api/hisobotlar/oylik?oy=${oy}&yil=${yil}`).then((r) => r.json()),
+      fetch(`/api/xarajatlar?oy=${oy}&yil=${yil}`).then((r) => r.json()),
+    ]).then(([hisobot, xar]) => {
+      setData(hisobot);
+      setXarajatlar(xar);
+      setYukl(false);
+    }).catch(() => setYukl(false));
   }, [oy, yil]);
 
   const print = () => window.print();
@@ -157,6 +169,55 @@ export default function HisobotlarPage() {
                 </CardBody>
               </Card>
             </div>
+
+            {/* P&L — Daromad / Xarajat / Foyda */}
+            {(() => {
+              const jamiXarajat = xarajatlar.reduce((s, x) => s + x.summa, 0);
+              const foyda = data.jamilTushum - jamiXarajat;
+              const turStat = (Object.keys(XARAJAT_TUR_LABEL) as XarajatTur[])
+                .map((tur) => ({ tur, summa: xarajatlar.filter((x) => x.tur === tur).reduce((s, x) => s + x.summa, 0) }))
+                .filter((t) => t.summa > 0);
+              return (
+                <Card>
+                  <CardHeader><CardTitle>Moliyaviy natija (P&L)</CardTitle></CardHeader>
+                  <CardBody>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="bg-green-50 rounded-xl p-4">
+                        <p className="text-xs text-green-600">Daromad</p>
+                        <p className="text-xl font-bold text-green-700 mt-1">{formatSum(data.jamilTushum)}</p>
+                      </div>
+                      <div className="bg-red-50 rounded-xl p-4">
+                        <p className="text-xs text-red-600">Xarajat</p>
+                        <p className="text-xl font-bold text-red-600 mt-1">{formatSum(jamiXarajat)}</p>
+                      </div>
+                      <div className={`rounded-xl p-4 ${foyda >= 0 ? "bg-brand-50" : "bg-amber-50"}`}>
+                        <p className={`text-xs ${foyda >= 0 ? "text-brand-600" : "text-amber-600"}`}>Foyda</p>
+                        <p className={`text-xl font-bold mt-1 ${foyda >= 0 ? "text-brand-700" : "text-amber-600"}`}>
+                          {foyda >= 0 ? "+" : ""}{formatSum(foyda)}
+                        </p>
+                      </div>
+                    </div>
+                    {turStat.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500">Xarajat tafsiloti</p>
+                        {turStat.map(({ tur, summa }) => (
+                          <div key={tur} className="flex justify-between text-sm py-1 border-b border-gray-50 last:border-0">
+                            <span className="text-gray-600">{XARAJAT_TUR_LABEL[tur]}</span>
+                            <span className="font-medium text-red-600">{formatSum(summa)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {xarajatlar.length === 0 && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        Bu oy xarajat kiritilmagan.{" "}
+                        <a href="/dashboard/xarajatlar" className="text-brand-600 hover:underline">Xarajatlar →</a>
+                      </p>
+                    )}
+                  </CardBody>
+                </Card>
+              );
+            })()}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* To'lov turlari */}

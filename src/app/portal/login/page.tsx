@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function PortalLoginPage() {
   const router = useRouter();
-  const [login, setLogin] = useState("");
+  const [login, setLogin] = useState("+998");
   const [parol, setParol] = useState("");
   const [xato, setXato] = useState("");
   const [yuklanyapti, setYuklanyapti] = useState(false);
@@ -81,7 +81,7 @@ export default function PortalLoginPage() {
 
             <button
               type="submit"
-              disabled={yuklanyapti || !login || !parol}
+              disabled={yuklanyapti || login.length < 5 || !parol}
               className="w-full py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {yuklanyapti ? "Kirilmoqda..." : "Kirish"}

@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { IconButton, TrashIcon, LinkIcon } from "@/components/ui/IconButton";
+import { excelYuklab, excelOqish } from "@/lib/excel";
 import type { TalabaWithGuruh } from "@/types";
 
 type GuruhOption = { id: string; nom: string; kurs: { nom: string } };
@@ -125,9 +126,53 @@ export default function TalabalarPage() {
       <Topbar
         title="Talabalar"
         actions={
-          <Button variant="primary" onClick={() => setModal(true)}>
-            + Yangi talaba
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => excelYuklab(
+                talabalar.map((t) => ({
+                  "Ism": t.ism,
+                  "Familiya": t.familiya,
+                  "Telefon": t.telefon,
+                  "Ota telefon": t.otaTelefon ?? "",
+                  "Email": t.email ?? "",
+                  "Guruh": t.guruhlar[0]?.guruh.nom ?? "",
+                  "Kurs": t.guruhlar[0]?.guruh.kurs.nom ?? "",
+                })),
+                "talabalar"
+              )}
+            >
+              Excel ↓
+            </Button>
+            <label className="cursor-pointer px-3 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-600 transition-colors">
+              Excel ↑
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={async (e) => {
+                  const fayl = e.target.files?.[0];
+                  if (!fayl) return;
+                  const rows = await excelOqish(fayl) as { Ism?: string; Familiya?: string; Telefon?: string; "Ota telefon"?: string }[];
+                  for (const row of rows) {
+                    if (!row.Ism || !row.Familiya || !row.Telefon) continue;
+                    await fetch("/api/talabalar", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        ism: row.Ism, familiya: row.Familiya,
+                        telefon: String(row.Telefon),
+                        otaTelefon: row["Ota telefon"] ? String(row["Ota telefon"]) : null,
+                      }),
+                    });
+                  }
+                  fetchTalabalar();
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            <Button variant="primary" onClick={() => setModal(true)}>+ Yangi talaba</Button>
+          </div>
         }
       />
 

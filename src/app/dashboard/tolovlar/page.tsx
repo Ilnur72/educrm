@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { oyNomi } from "@/lib/utils";
+import { excelYuklab } from "@/lib/excel";
 import type { TolovTur } from "@/types";
 
 type TolovRow = {
@@ -64,6 +65,12 @@ export default function TolovlarPage() {
     fetchTolovlar();
   };
 
+  const ochirish = async (id: string) => {
+    if (!confirm("Bu to'lovni o'chirasizmi?")) return;
+    await fetch(`/api/tolovlar/${id}`, { method: "DELETE" });
+    fetchTolovlar();
+  };
+
   const jami = tolovlar.reduce((s, t) => s + t.summa, 0);
   const naqd = tolovlar.filter((t) => t.tur === "NAQD").reduce((s, t) => s + t.summa, 0);
   const karta = tolovlar.filter((t) => t.tur === "KARTA" || t.tur === "CLICK" || t.tur === "PAYME").reduce((s, t) => s + t.summa, 0);
@@ -73,7 +80,28 @@ export default function TolovlarPage() {
       <Topbar
         title="To'lovlar"
         actions={
-          <Button variant="primary" onClick={() => setModal(true)}>+ To'lov qo'shish</Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => excelYuklab(
+                tolovlar.map((t) => ({
+                  "Talaba": `${t.talaba.ism} ${t.talaba.familiya}`,
+                  "Telefon": t.talaba.telefon,
+                  "Summa": t.summa,
+                  "Tur": t.tur,
+                  "Oy": t.oy,
+                  "Yil": t.yil,
+                  "Qabul qildi": t.qabulQildi ?? "",
+                  "Izoh": t.izoh ?? "",
+                  "Sana": new Date(t.createdAt).toLocaleDateString("uz-UZ"),
+                })),
+                `tolovlar_${oyNomi(oy)}_${yil}`
+              )}
+            >
+              Excel ↓
+            </Button>
+            <Button variant="primary" onClick={() => setModal(true)}>+ To'lov qo'shish</Button>
+          </div>
         }
       />
 
@@ -124,6 +152,7 @@ export default function TolovlarPage() {
                 <Th>Qabul qildi</Th>
                 <Th>Izoh</Th>
                 <Th>Sana</Th>
+                <Th></Th>
               </tr>
             </Thead>
             <Tbody>
@@ -137,6 +166,15 @@ export default function TolovlarPage() {
                   <Td className="text-gray-400">{t.izoh ?? "—"}</Td>
                   <Td className="text-xs text-gray-400">
                     {new Date(t.createdAt).toLocaleDateString("uz-UZ")}
+                  </Td>
+                  <Td>
+                    <button
+                      onClick={() => ochirish(t.id)}
+                      className="text-gray-300 hover:text-red-400 text-lg leading-none transition-colors"
+                      title="O'chirish"
+                    >
+                      ×
+                    </button>
                   </Td>
                 </Tr>
               ))}

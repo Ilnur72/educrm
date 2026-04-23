@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/Card";
 import { Table, Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
 import { formatSum, formatSana, oyNomi } from "@/lib/utils";
+import { DashboardGrafik } from "@/components/ui/DashboardGrafik";
 
 async function getStats() {
   const hozir = new Date();
@@ -186,6 +187,9 @@ export default async function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Grafik */}
+        <DashboardGrafik />
 
         {/* Bugungi darslar */}
         <Card>

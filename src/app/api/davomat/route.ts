@@ -6,10 +6,34 @@ import { sendMessage, xabarKelmadi, xabarKechKeldi } from "@/lib/telegram";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const guruhId = searchParams.get("guruhId");
-  const darsId = searchParams.get("darsId");
+  const darsId  = searchParams.get("darsId");
+  const sana    = searchParams.get("sana"); // "YYYY-MM-DD"
 
   if (!guruhId) {
     return NextResponse.json({ error: "guruhId kerak" }, { status: 400 });
+  }
+
+  // Sana bo'yicha darsni topish
+  if (sana && !darsId) {
+    const sanaBoshi = new Date(sana);
+    const sanaOxiri = new Date(sana);
+    sanaOxiri.setDate(sanaOxiri.getDate() + 1);
+
+    const dars = await prisma.dars.findFirst({
+      where: {
+        guruhId,
+        sana: { gte: sanaBoshi, lt: sanaOxiri },
+      },
+    });
+
+    if (!dars) return NextResponse.json({ dars: null, davomatlar: [] });
+
+    const davomatlar = await prisma.davomat.findMany({
+      where: { darsId: dars.id },
+      select: { talabaId: true, holat: true, baho: true },
+    });
+
+    return NextResponse.json({ dars, davomatlar });
   }
 
   const davomatlar = await prisma.davomat.findMany({
@@ -31,10 +55,30 @@ export async function POST(req: NextRequest) {
   // body: { guruhId, sana, davomatlar: [{talabaId, holat}] }
   const { guruhId, sana, mavzu, davomatlar } = body;
 
-  // Dars yaratish
-  const dars = await prisma.dars.create({
-    data: { guruhId, sana: new Date(sana), mavzu },
+  // Mavjud darsni tekshirish (upsert)
+  const sanaBoshi = new Date(sana);
+  const sanaOxiri = new Date(sana);
+  sanaOxiri.setDate(sanaOxiri.getDate() + 1);
+
+  const mavjudDars = await prisma.dars.findFirst({
+    where: { guruhId, sana: { gte: sanaBoshi, lt: sanaOxiri } },
   });
+
+  let dars;
+  if (mavjudDars) {
+    // Mavjud darsni yangilaymiz
+    dars = await prisma.dars.update({
+      where: { id: mavjudDars.id },
+      data: { mavzu },
+    });
+    // Eski davomatlarni o'chiramiz
+    await prisma.davomat.deleteMany({ where: { darsId: dars.id } });
+  } else {
+    // Yangi dars yaratamiz
+    dars = await prisma.dars.create({
+      data: { guruhId, sana: new Date(sana), mavzu },
+    });
+  }
 
   // Davomatlarni saqlash
   const result = await prisma.davomat.createMany({

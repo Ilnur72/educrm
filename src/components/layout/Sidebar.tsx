@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -13,23 +14,24 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { href: "/dashboard",                    icon: "▦", label: "Dashboard",         roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/oqituvchi",          icon: "▦", label: "Dashboard",         roles: ["OQITUVCHI"] },
-  { href: "/dashboard/lidlar",             icon: "◎", label: "Lidlar",            roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/talabalar",          icon: "◉", label: "Talabalar",         roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/kurslar",            icon: "▤", label: "Kurslar",           roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/guruhlar",           icon: "▣", label: "Guruhlar",          roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/davomat",            icon: "▣", label: "Davomat" },
-  { href: "/dashboard/tolovlar",           icon: "◈", label: "To'lovlar",         roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/jadval",             icon: "▦", label: "Dars jadvali" },
-  { href: "/dashboard/qarzdorlar",         icon: "◌", label: "Qarzdorlar",        roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/xabarlar",           icon: "◉", label: "Xabarlar",          roles: ["ADMIN","RECEPTION"] },
-  { href: "/dashboard/oqituvchilar",       icon: "◍", label: "O'qituvchilar",     roles: ["ADMIN"] },
-  { href: "/dashboard/oqituvchilar/ish-haqi", icon: "◈", label: "Ish haqi",        roles: ["ADMIN"] },
-  { href: "/hisobotlar",         icon: "◫", label: "Hisobotlar",        roles: ["ADMIN"] },
-  { href: "/davomat-hisoboti",   icon: "▣", label: "Davomat hisoboti",  roles: ["ADMIN"] },
-  { href: "/dashboard/xonalar",            icon: "▭", label: "Xonalar",           roles: ["ADMIN"] },
-  { href: "/dashboard/foydalanuvchilar",   icon: "◬", label: "Foydalanuvchilar",  roles: ["ADMIN"] },
+  { href: "/dashboard",                       icon: "▦", label: "Dashboard",         roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/oqituvchi",             icon: "▦", label: "Dashboard",         roles: ["OQITUVCHI"] },
+  { href: "/dashboard/lidlar",                icon: "◎", label: "Lidlar",            roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/talabalar",             icon: "◉", label: "Talabalar",         roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/kurslar",               icon: "▤", label: "Kurslar",           roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/guruhlar",              icon: "▣", label: "Guruhlar",          roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/davomat",               icon: "▣", label: "Davomat" },
+  { href: "/dashboard/tolovlar",              icon: "◈", label: "To'lovlar",         roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/jadval",                icon: "▦", label: "Dars jadvali" },
+  { href: "/dashboard/qarzdorlar",            icon: "◌", label: "Qarzdorlar",        roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/xabarlar",              icon: "◉", label: "Xabarlar",          roles: ["ADMIN","RECEPTION"] },
+  { href: "/dashboard/oqituvchilar",          icon: "◍", label: "O'qituvchilar",     roles: ["ADMIN"] },
+  { href: "/dashboard/oqituvchilar/ish-haqi", icon: "◈", label: "Ish haqi",          roles: ["ADMIN"] },
+  { href: "/hisobotlar",                      icon: "◫", label: "Hisobotlar",        roles: ["ADMIN"] },
+  { href: "/davomat-hisoboti",                icon: "▣", label: "Davomat hisoboti",  roles: ["ADMIN"] },
+  { href: "/dashboard/xarajatlar",            icon: "◫", label: "Xarajatlar",        roles: ["ADMIN"] },
+  { href: "/dashboard/xonalar",               icon: "▭", label: "Xonalar",           roles: ["ADMIN"] },
+  { href: "/dashboard/foydalanuvchilar",      icon: "◬", label: "Foydalanuvchilar",  roles: ["ADMIN"] },
 ];
 
 const roleLabel: Record<Role, string> = {
@@ -44,7 +46,7 @@ const roleColor: Record<Role, string> = {
   RECEPTION: "bg-blue-100 text-blue-700",
 };
 
-export function Sidebar() {
+function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const role = session?.user?.role as Role | undefined;
@@ -58,9 +60,9 @@ export function Sidebar() {
     : "?";
 
   return (
-    <aside className="w-56 min-h-screen bg-white border-r border-gray-100 flex flex-col">
+    <aside className="w-56 h-full bg-white border-r border-gray-100 flex flex-col">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-gray-100">
+      <div className="px-5 py-5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-bold">E</span>
@@ -70,6 +72,11 @@ export function Sidebar() {
             <p className="text-xs text-gray-400">O'quv markaz</p>
           </div>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none lg:hidden">
+            ×
+          </button>
+        )}
       </div>
 
       {/* Nav */}
@@ -83,6 +90,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                 isActive
@@ -124,5 +132,40 @@ export function Sidebar() {
         </button>
       </div>
     </aside>
+  );
+}
+
+export function Sidebar() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <div className="hidden lg:flex min-h-screen">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-30 w-9 h-9 flex items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm"
+        aria-label="Menyu"
+      >
+        <span className="text-gray-600 text-lg leading-none">☰</span>
+      </button>
+
+      {/* Mobile overlay */}
+      {open && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 flex"
+          onClick={() => setOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="relative z-50 h-full" onClick={(e) => e.stopPropagation()}>
+            <SidebarContent onClose={() => setOpen(false)} />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

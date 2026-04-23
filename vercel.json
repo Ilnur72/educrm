@@ -10,6 +10,14 @@
     {
       "path": "/api/cron/xavf-tahlil",
       "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/sinov-eslatma",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/tugrilgan-kun",
+      "schedule": "0 8 * * *"
     }
   ]
 }

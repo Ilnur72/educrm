@@ -258,6 +258,28 @@ model IshHaq {
   @@map("ish_haqlar")
 }
 
+// ─── XARAJATLAR ────────────────────────────────────────────────────────────
+
+model Xarajat {
+  id        String     @id @default(cuid())
+  tur       XarajatTur
+  summa     Int
+  sana      DateTime
+  izoh      String?
+  createdAt DateTime   @default(now())
+
+  @@map("xarajatlar")
+}
+
+enum XarajatTur {
+  IJARA
+  KOMMUNAL
+  REKLAMA
+  MAOSH
+  JIHOZLAR
+  BOSHQA
+}
+
 // ─── XONALAR ───────────────────────────────────────────────────────────────
 
 model Xona {

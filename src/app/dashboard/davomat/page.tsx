@@ -48,16 +48,38 @@ function DavomatContent() {
 
   const fetchTalabalar = useCallback(async () => {
     if (!guruhId) return;
-    const res = await fetch(`/api/talabalar?guruhId=${guruhId}&faol=true`);
-    const data: TalabaRow[] = await res.json();
+    const [talabaRes, mavjudRes] = await Promise.all([
+      fetch(`/api/talabalar?guruhId=${guruhId}&faol=true`),
+      fetch(`/api/davomat?guruhId=${guruhId}&sana=${sana}`),
+    ]);
+    const data: TalabaRow[] = await talabaRes.json();
+    const mavjud: { dars: { mavzu: string | null } | null; davomatlar: { talabaId: string; holat: DavomatHolat; baho: number | null }[] } = await mavjudRes.json();
+
     setTalabalar(data);
-    // Default: hammasi keldi
-    const def: Record<string, DavomatHolat> = {};
-    data.forEach((t) => { def[t.id] = "KELDI"; });
-    setDavomatlar(def);
-    setBaholar({});
     setSaqlandi(false);
-  }, [guruhId]);
+
+    if (mavjud.dars && mavjud.davomatlar.length > 0) {
+      // Mavjud ma'lumot bilan to'ldirish
+      const davMap: Record<string, DavomatHolat> = {};
+      const bahoMap: Record<string, string> = {};
+      data.forEach((t) => { davMap[t.id] = "KELDI"; });
+      mavjud.davomatlar.forEach((d) => {
+        davMap[d.talabaId] = d.holat;
+        if (d.baho !== null) bahoMap[d.talabaId] = String(d.baho);
+      });
+      setDavomatlar(davMap);
+      setBaholar(bahoMap);
+      if (mavjud.dars.mavzu) setMavzu(mavjud.dars.mavzu);
+      setSaqlandi(true); // Ko'rsatish uchun "Qayta saqlash" tugmasi
+    } else {
+      // Yangi: hammasi KELDI, bo'sh
+      const def: Record<string, DavomatHolat> = {};
+      data.forEach((t) => { def[t.id] = "KELDI"; });
+      setDavomatlar(def);
+      setBaholar({});
+      setMavzu("");
+    }
+  }, [guruhId, sana]);
 
   useEffect(() => { fetchTalabalar(); }, [fetchTalabalar]);
 
@@ -96,9 +118,9 @@ function DavomatContent() {
           <Button
             variant="primary"
             onClick={saqlash}
-            disabled={!guruhId || talabalar.length === 0 || saqlanmoqda || saqlandi}
+            disabled={!guruhId || talabalar.length === 0 || saqlanmoqda}
           >
-            {saqlandi ? "✓ Saqlandi" : saqlanmoqda ? "Saqlanmoqda..." : "Saqlash"}
+            {saqlanmoqda ? "Saqlanmoqda..." : saqlandi ? "✓ Qayta saqlash" : "Saqlash"}
           </Button>
         }
       />

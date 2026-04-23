@@ -293,17 +293,23 @@ export default function LidlarPage() {
                             setSinovGuruhId(lid.sinovGuruhId ?? "");
                             setSinovModal(true);
                           }}
-                          className="text-left"
+                          className="text-left space-y-1"
                         >
                           {lid.sinovSanasi ? (
-                            <span className="text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 font-medium">
+                            <span className="block text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 font-medium">
                               {new Date(lid.sinovSanasi).toLocaleDateString("uz-UZ")}
                             </span>
                           ) : (
-                            <span className="text-purple-400 border border-dashed border-purple-300 rounded-lg px-2 py-1">
+                            <span className="block text-purple-400 border border-dashed border-purple-300 rounded-lg px-2 py-1">
                               + Sana tanlang
                             </span>
                           )}
+                          {lid.sinovGuruhId && (() => {
+                            const g = guruhlar.find(g => g.id === lid.sinovGuruhId);
+                            return g ? (
+                              <span className="block text-gray-400 text-xs">{g.nom}</span>
+                            ) : null;
+                          })()}
                         </button>
                       ) : (
                         formatSana(lid.createdAt)
