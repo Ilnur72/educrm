@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import type { Role } from "@/types";
+
+type AppRole = "DIREKTOR" | "ADMIN" | "OQITUVCHI" | "RECEPTION";
 
 type NavItem = {
   href: string;
   icon: string;
   label: string;
-  roles?: Role[];
+  roles?: AppRole[];
 };
 
 const navItems: NavItem[] = [
@@ -32,15 +33,21 @@ const navItems: NavItem[] = [
   { href: "/dashboard/xarajatlar",            icon: "◫", label: "Xarajatlar",        roles: ["ADMIN"] },
   { href: "/dashboard/xonalar",               icon: "▭", label: "Xonalar",           roles: ["ADMIN"] },
   { href: "/dashboard/foydalanuvchilar",      icon: "◬", label: "Foydalanuvchilar",  roles: ["ADMIN"] },
+  // DIREKTOR
+  { href: "/dashboard/direktor",              icon: "▦", label: "Umumiy ko'rinish",  roles: ["DIREKTOR"] },
+  { href: "/dashboard/filiallar",             icon: "◫", label: "Filiallar",         roles: ["DIREKTOR"] },
+  { href: "/hisobotlar",                      icon: "◫", label: "Hisobotlar",        roles: ["DIREKTOR"] },
 ];
 
-const roleLabel: Record<Role, string> = {
+const roleLabel: Record<AppRole, string> = {
+  DIREKTOR:  "Direktor",
   ADMIN:     "Administrator",
   OQITUVCHI: "O'qituvchi",
   RECEPTION: "Resepshn",
 };
 
-const roleColor: Record<Role, string> = {
+const roleColor: Record<AppRole, string> = {
+  DIREKTOR:  "bg-indigo-100 text-indigo-700",
   ADMIN:     "bg-purple-100 text-purple-700",
   OQITUVCHI: "bg-teal-100 text-teal-700",
   RECEPTION: "bg-blue-100 text-blue-700",
@@ -49,7 +56,7 @@ const roleColor: Record<Role, string> = {
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const role = session?.user?.role as Role | undefined;
+  const role = session?.user?.role as AppRole | undefined;
 
   const visible = navItems.filter(
     (item) => !item.roles || (role && item.roles.includes(role))

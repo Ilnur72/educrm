@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getFilialFilter } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const kursId = searchParams.get("kursId");
   const faol = searchParams.get("faol");
+  const filialFilter = await getFilialFilter(searchParams.get("filialId"));
 
   const guruhlar = await prisma.guruh.findMany({
     where: {
+      ...filialFilter,
       ...(kursId && { kursId }),
       ...(faol !== null && { faol: faol === "true" }),
     },
@@ -42,7 +45,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const guruh = await prisma.guruh.create({ data: body });
+  const filialFilter = await getFilialFilter();
+  const guruh = await prisma.guruh.create({
+    data: {
+      ...body,
+      ...(filialFilter && "filialId" in filialFilter ? { filialId: filialFilter.filialId } : {}),
+    },
+  });
   return NextResponse.json(guruh, { status: 201 });
 }
 

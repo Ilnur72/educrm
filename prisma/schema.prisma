@@ -7,6 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── FILIALLAR ──────────────────────────────────────────────────────────────
+
+model Filial {
+  id        String   @id @default(cuid())
+  nom       String
+  manzil    String?
+  telefon   String?
+  faol      Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userlar    User[]
+  guruhlar   Guruh[]
+  talabalar  Talaba[]
+  lidlar     Lid[]
+  xarajatlar Xarajat[]
+  xonalar    Xona[]
+
+  @@map("filiallar")
+}
+
 // ─── FOYDALANUVCHILAR ───────────────────────────────────────────────────────
 
 model User {
@@ -16,6 +37,8 @@ model User {
   password  String
   role      Role     @default(RECEPTION)
   avatar    String?
+  filialId  String?
+  filial    Filial?  @relation(fields: [filialId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -25,6 +48,7 @@ model User {
 }
 
 enum Role {
+  DIREKTOR
   ADMIN
   OQITUVCHI
   RECEPTION
@@ -44,6 +68,8 @@ model Lid {
   keyingiQongiroq DateTime?
   sinovSanasi     DateTime?
   sinovGuruhId    String?
+  filialId        String?
+  filial          Filial?   @relation(fields: [filialId], references: [id])
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -100,6 +126,8 @@ model Guruh {
   boshlanish  DateTime
   tugash      DateTime?
   faol        Boolean    @default(true)
+  filialId    String?
+  filial      Filial?    @relation(fields: [filialId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -153,6 +181,8 @@ model Talaba {
   faol            Boolean   @default(true)
   login           String?   @unique  // Portal uchun login (telefon yoki custom)
   parolHash       String?            // bcrypt hash
+  filialId        String?
+  filial          Filial?   @relation(fields: [filialId], references: [id])
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -266,6 +296,8 @@ model Xarajat {
   summa     Int
   sana      DateTime
   izoh      String?
+  filialId  String?
+  filial    Filial?    @relation(fields: [filialId], references: [id])
   createdAt DateTime   @default(now())
 
   @@map("xarajatlar")
@@ -288,6 +320,8 @@ model Xona {
   sigim     Int?
   izoh      String?
   faol      Boolean  @default(true)
+  filialId  String?
+  filial    Filial?  @relation(fields: [filialId], references: [id])
   createdAt DateTime @default(now())
 
   @@map("xonalar")

@@ -18,9 +18,18 @@ export default withAuth(
       return NextResponse.redirect(new URL("/portal", req.url));
     }
 
-    // Faqat ADMIN ko'rishi mumkin bo'lgan sahifalar
+    // Faqat DIREKTOR ko'rishi mumkin bo'lgan sahifalar
+    if (path.startsWith("/dashboard/filiallar") && token?.role !== "DIREKTOR") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    // ADMIN va DIREKTOR ko'rishi mumkin bo'lgan sahifalar
     const adminOnly = ["/dashboard/oqituvchilar", "/dashboard/hisobotlar", "/hisobotlar", "/davomat-hisoboti"];
-    if (adminOnly.some((p) => path.startsWith(p)) && token?.role !== "ADMIN") {
+    if (
+      adminOnly.some((p) => path.startsWith(p)) &&
+      token?.role !== "ADMIN" &&
+      token?.role !== "DIREKTOR"
+    ) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 

@@ -7,12 +7,16 @@ export async function GET(req: NextRequest) {
   const oy = searchParams.get("oy");
   const yil = searchParams.get("yil");
   const talabaId = searchParams.get("talabaId");
+  const guruhId = searchParams.get("guruhId");
 
   const tolovlar = await prisma.tolov.findMany({
     where: {
       ...(oy && { oy: parseInt(oy) }),
       ...(yil && { yil: parseInt(yil) }),
       ...(talabaId && { talabaId }),
+      ...(guruhId && {
+        talaba: { guruhlar: { some: { guruhId, faol: true } } },
+      }),
     },
     include: {
       talaba: { select: { id: true, ism: true, familiya: true, telefon: true } },

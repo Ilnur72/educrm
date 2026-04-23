@@ -23,11 +23,15 @@ const TUR_LABEL: Record<TolovTur, string> = {
   NAQD: "Naqd", KARTA: "Karta", CLICK: "Click", PAYME: "Payme"
 };
 
+type GuruhOption = { id: string; nom: string; kurs: { nom: string } };
+
 export default function TolovlarPage() {
   const hozir = new Date();
   const [tolovlar, setTolovlar] = useState<TolovRow[]>([]);
   const [oy, setOy] = useState(hozir.getMonth() + 1);
   const [yil, setYil] = useState(hozir.getFullYear());
+  const [guruhId, setGuruhId] = useState("");
+  const [guruhlar, setGuruhlar] = useState<GuruhOption[]>([]);
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({
     talabaId: "", summa: "", tur: "NAQD", oy: hozir.getMonth() + 1, yil: hozir.getFullYear(), izoh: ""
@@ -37,12 +41,21 @@ export default function TolovlarPage() {
   const [saqlanyapti, setSaqlanyapti] = useState(false);
 
   const fetchTolovlar = useCallback(async () => {
-    const res = await fetch(`/api/tolovlar?oy=${oy}&yil=${yil}`);
+    const params = new URLSearchParams({ oy: String(oy), yil: String(yil) });
+    if (guruhId) params.set("guruhId", guruhId);
+    const res = await fetch(`/api/tolovlar?${params}`);
     const data = await res.json();
     setTolovlar(data);
-  }, [oy, yil]);
+  }, [oy, yil, guruhId]);
 
   useEffect(() => { fetchTolovlar(); }, [fetchTolovlar]);
+
+  useEffect(() => {
+    fetch("/api/guruhlar?faol=true")
+      .then((r) => r.json())
+      .then(setGuruhlar)
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!talabaQidiruv) { setTalabalar([]); return; }
@@ -52,6 +65,16 @@ export default function TolovlarPage() {
   }, [talabaQidiruv]);
 
   const saqlash = async () => {
+    // Qayta to'lov tekshiruvi — shu oy uchun allaqachon to'lov bor bo'lsa ogohlantirish
+    const mavjud = tolovlar.find(
+      (t) => t.talaba.id === form.talabaId && t.oy === form.oy && t.yil === form.yil
+    );
+    if (mavjud) {
+      const tasdiqlash = confirm(
+        `Bu talaba ${form.oy}-oy uchun allaqachon to'lov qilgan (${mavjud.summa.toLocaleString()} so'm). Qayta to'lov qo'shilsinmi?`
+      );
+      if (!tasdiqlash) return;
+    }
     setSaqlanyapti(true);
     await fetch("/api/tolovlar", {
       method: "POST",
@@ -106,8 +129,8 @@ export default function TolovlarPage() {
       />
 
       <div className="p-6 space-y-5">
-        {/* Oy tanlash */}
-        <div className="flex items-center gap-3">
+        {/* Filtrlar */}
+        <div className="flex items-center gap-3 flex-wrap">
           <select
             value={oy}
             onChange={(e) => setOy(parseInt(e.target.value))}
@@ -124,7 +147,24 @@ export default function TolovlarPage() {
           >
             {[2024, 2025, 2026].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
-          <span className="text-sm text-gray-500">{oyNomi(oy)} {yil}</span>
+          <select
+            value={guruhId}
+            onChange={(e) => setGuruhId(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+          >
+            <option value="">Barcha guruhlar</option>
+            {guruhlar.map((g) => (
+              <option key={g.id} value={g.id}>{g.kurs.nom} — {g.nom}</option>
+            ))}
+          </select>
+          {guruhId && (
+            <button
+              onClick={() => setGuruhId("")}
+              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              × Tozalash
+            </button>
+          )}
         </div>
 
         {/* Statistika */}

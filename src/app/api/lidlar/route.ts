@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession, getFilialFilter } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { LidHolat, LidManba } from "@prisma/client";
 
@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("search");
   const oy     = searchParams.get("oy");
   const yil    = searchParams.get("yil");
+  const filialFilter = await getFilialFilter(searchParams.get("filialId"));
 
   let dateFilter = {};
   if (oy && yil) {
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
 
   const lidlar = await prisma.lid.findMany({
     where: {
+      ...filialFilter,
       ...(holat  && { holat }),
       ...(manba  && { manba }),
       ...dateFilter,
@@ -66,6 +68,12 @@ export async function POST(req: NextRequest) {
   if (!await auth()) return NextResponse.json({ error: "Kirish kerak" }, { status: 401 });
 
   const body = await req.json();
-  const lid  = await prisma.lid.create({ data: body });
+  const filialFilter = await getFilialFilter();
+  const lid  = await prisma.lid.create({
+    data: {
+      ...body,
+      ...(filialFilter && "filialId" in filialFilter ? { filialId: filialFilter.filialId } : {}),
+    },
+  });
   return NextResponse.json(lid, { status: 201 });
 }

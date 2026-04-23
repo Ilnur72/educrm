@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getSession, getFilialFilter } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -9,8 +9,9 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") ?? searchParams.get("q");
   const faol   = searchParams.get("faol");
+  const filialFilter = await getFilialFilter(searchParams.get("filialId"));
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { ...filialFilter };
   if (faol !== null) where.faol = faol === "true";
   if (search) {
     where.OR = [
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ism, familiya va telefon majburiy" }, { status: 400 });
   }
 
+  const filialFilter = await getFilialFilter();
   const talaba = await prisma.talaba.create({
     data: {
       ism,
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest) {
       manzil:     manzil     || null,
       izoh:       izoh       || null,
       tugilganKun: tugilganKun ? new Date(tugilganKun) : null,
+      ...(filialFilter && "filialId" in filialFilter ? { filialId: filialFilter.filialId } : {}),
     },
   });
 

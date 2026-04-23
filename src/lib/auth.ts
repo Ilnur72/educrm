@@ -2,12 +2,12 @@ import { NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { Role } from "@prisma/client";
 
 declare module "next-auth" {
   interface User {
     role: string; // Role | "TALABA"
     talabaId?: string;
+    filialId?: string | null;
   }
   interface Session {
     user: {
@@ -16,6 +16,7 @@ declare module "next-auth" {
       email: string;
       role: string;
       talabaId?: string;
+      filialId?: string | null;
     };
   }
 }
@@ -25,6 +26,7 @@ declare module "next-auth/jwt" {
     id: string;
     role: string;
     talabaId?: string;
+    filialId?: string | null;
   }
 }
 
@@ -46,7 +48,8 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const user = await (prisma.user.findUnique as any)({
           where: { email: credentials.email },
         });
         if (!user) return null;
@@ -54,7 +57,13 @@ export const authOptions: NextAuthOptions = {
         const ok = await bcrypt.compare(credentials.password, user.password);
         if (!ok) return null;
 
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          filialId: user.filialId ?? null,
+        };
       },
     }),
 
@@ -69,7 +78,8 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.login || !credentials?.password) return null;
 
-        const talaba = await prisma.talaba.findUnique({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const talaba = await (prisma.talaba.findUnique as any)({
           where: { login: credentials.login },
         });
         if (!talaba?.parolHash) return null;
@@ -90,15 +100,17 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id   = user.id;
-        token.role = user.role;
+        token.id       = user.id;
+        token.role     = user.role;
+        token.filialId = user.filialId ?? null;
         if (user.talabaId) token.talabaId = user.talabaId;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id   = token.id;
-      session.user.role = token.role;
+      session.user.id       = token.id;
+      session.user.role     = token.role;
+      session.user.filialId = token.filialId ?? null;
       if (token.talabaId) session.user.talabaId = token.talabaId;
       return session;
     },
@@ -107,11 +119,32 @@ export const authOptions: NextAuthOptions = {
 
 export const getSession = () => getServerSession(authOptions);
 
-export async function requireAuth(allowedRoles?: Role[]) {
+export async function requireAuth(allowedRoles?: string[]) {
   const session = await getSession();
   if (!session) return null;
-  if (allowedRoles && !allowedRoles.includes(session.user.role as Role)) return null;
+  if (allowedRoles && !allowedRoles.includes(session.user.role)) return null;
   return session;
+}
+
+/**
+ * DIREKTOR — hamma filiallarni ko'radi (filialId: null)
+ * ADMIN/RECEPTION/OQITUVCHI — faqat o'z filialini ko'radi
+ * Agar queryda filialId berilsa (DIREKTOR uchun) — shu filial bo'yicha filtrlanadi
+ */
+export async function getFilialFilter(overrideFilialId?: string | null) {
+  const session = await getSession();
+  if (!session) return null;
+
+  const role = session.user.role;
+
+  // DIREKTOR — barcha filiallar, yoki belgilangan filial
+  if (role === "DIREKTOR") {
+    return overrideFilialId ? { filialId: overrideFilialId } : {};
+  }
+
+  // Boshqa rollar — faqat o'z filiali
+  const filialId = session.user.filialId;
+  return filialId ? { filialId } : {};
 }
 
 export async function requirePortalAuth() {
