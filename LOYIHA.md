@@ -1,8 +1,54 @@
-# EduCRM — Loyiha hujjati
+# EduCRM — Loyiha hisoboti
 
-> **Maqsad:** O'quv markaz uchun to'liq CRM tizimi — lidlar, talabalar, davomat, to'lovlar, o'qituvchilar va hisobotlarni boshqarish.
+> **Sana:** 2026-04-24
+> **Holat:** ✅ Production ga tayyor
+> **Versiya:** V2.1
 
-**Texnologiyalar:** Next.js 14 (App Router) · Prisma ORM · PostgreSQL · NextAuth.js · Tailwind CSS · Telegram Bot API · Recharts
+**Texnologiyalar:** Next.js 14 · Prisma ORM · PostgreSQL (Neon) · NextAuth.js · Tailwind CSS · Telegram Bot API · Recharts · SheetJS
+
+---
+
+## Demo kirish ma'lumotlari
+
+> ⚠️ Quyidagi loginlar demo muhit uchun. Production da o'zgartirilsin.
+
+### Tizim xodimlari (Dashboard)
+
+| Rol | Email | Parol | Tavsif |
+|-----|-------|-------|--------|
+| **Direktor** | `direktor@educrm.uz` | `direktor123` | Barcha filiallarni ko'radi |
+| **Admin (Chilonzor)** | `admin.ch@educrm.uz` | `admin123` | Chilonzor filiali to'liq boshqaruvi |
+| **Admin (Yunusobod)** | `admin.yu@educrm.uz` | `admin123` | Yunusobod filiali to'liq boshqaruvi |
+| **Resepshn** | `reception.ch@educrm.uz` | `reception123` | Lid, talaba, to'lov |
+| **O'qituvchi** | `teacher1.ch@educrm.uz` | `oqituvchi123` | Davomat, o'z guruhlari |
+
+**Kirish URL:** `/login`
+
+### O'quvchi kabineti (Portal)
+
+| Telefon (login) | Parol | Tavsif |
+|----------------|-------|--------|
+| `+998901100001` | `talaba123` | Chilonzor filiali talabasi |
+| `+998902200001` | `talaba123` | Yunusobod filiali talabasi |
+
+**Kirish URL:** `/portal/login`
+
+---
+
+## Demo ma'lumotlar (Seed)
+
+| Ko'rsatkich | Miqdor |
+|------------|--------|
+| Filiallar | 2 (Chilonzor, Yunusobod) |
+| Kurslar | 4 (IELTS, Python, Ingliz tili, Matematika) |
+| Guruhlar | 8 (har filialda 4 ta) |
+| Talabalar | 20 (har filialda 10 ta) |
+| To'lovlar | ~60 ta (3 oy: Fevral–Aprel 2025) |
+| Davomat yozuvlari | ~480 ta (Fevral–Mart 2025) |
+| Lidlar | 11 ta (turli holatlarda) |
+| Xarajatlar | ~30 ta (3 oy) |
+
+**Demo seed ishga tushirish:** `npm run db:seed`
 
 ---
 
@@ -10,256 +56,176 @@
 
 | Rol | Kirish huquqi |
 |-----|---------------|
-| **ADMIN** | Barcha sahifalar va funksiyalar |
+| **DIREKTOR** | Barcha filiallarni ko'rish, filial yaratish/boshqarish, umumiy hisobotlar |
+| **ADMIN** | Faqat o'z filiali — barcha sahifalar va funksiyalar |
 | **RECEPTION** | Lidlar, talabalar, kurslar, davomat, to'lovlar, qarzdorlar |
-| **OQITUVCHI** | Faqat o'z guruhlari va davomat, ish haqi tarixi |
+| **OQITUVCHI** | Faqat o'z guruhlari, davomat, ish haqi tarixi |
+| **TALABA** | O'quvchi portali — davomat, to'lovlar, jadval, profil |
 
 ---
 
-## Modullar
+## Qurilgan modullar
 
-### 1. Dashboard (Bosh sahifa)
+### 1. Ko'p filial tizimi *(yangi)*
+
+**Sahifalar:** `/dashboard/direktor` · `/dashboard/filiallar`
+
+Bir nechta filiali bo'lgan o'quv markazlar uchun:
+- **Direktor** — barcha filiallarni bitta oynada ko'radi
+- Har filialning oylik statistikasi: talabalar, daromad, xarajat, foyda
+- Yangi filial yaratish, tahrirlash, yopish
+- Har bir xodim, talaba, guruh, lid o'z fililiga biriktiriladi
+- Admin faqat o'z filiali ma'lumotlarini ko'radi
+
+---
+
+### 2. Dashboard (Bosh sahifa)
+
 **Sahifa:** `/dashboard`
 
-Admin va resepshn uchun umumiy ko'rinish. O'qituvchi avtomatik o'z kabinetiga yo'naltiriladi.
-
-**Ko'rsatkichlar:**
-- Jami faol talabalar soni
-- Oylik tushum (joriy oy to'lovlari yig'indisi)
-- Faol kurslar soni
-- Bu oy yangi lidlar soni
-
-**Widgetlar:**
-- **Bugungi sinov darslar** — o'sha kuni sinov darsi belgilangan lidlar ro'yxati (binafsha blok)
-- **Xavfli talabalar** — chiqib ketish xavfi bor talabalar (qizil blok, to 5 ta ko'rsatadi)
-- **Bugungi darslar** — jadval: vaqt, kurs, guruh, o'qituvchi, xona
-- **Oxirgi lidlar** — eng yangi 5 ta lid va holati
-- **Oxirgi to'lovlar** — eng yangi 5 ta to'lov
+- Jami talabalar, oylik tushum, faol kurslar, yangi lidlar
+- Bugungi sinov darslar (binafsha blok)
+- Xavfli talabalar widget (churn prediction)
+- Bugungi darslar jadvali
+- Oylik daromad grafigi (BarChart, 12 oy)
+- Talabalar o'sishi grafigi (AreaChart)
 
 ---
 
-### 2. Lidlar (Sotish funeli)
+### 3. Lidlar (Sotish funeli)
+
 **Sahifa:** `/dashboard/lidlar`
 
-Potentsial o'quvchilarni boshqarish va ularni talabaga o'tkazish.
-
-**Lid holatlari (funnel):**
 ```
 YANGI → QONGIROQ_QILINDI → SINOV_DARSI → YOZILDI
                                         ↘ RAD_ETDI
 ```
 
-**Funksiyalar:**
-- Funnel statistikasi (har bir holatdagi lidlar soni)
-- **Oy/yil filtri** — qaysi oyda nechta lid yozilgani
-- Holat bo'yicha filtrlash (funnel tugmalariga bosib)
-- Ism/telefon bo'yicha qidirish
-- Yangi lid qo'shish (ism, telefon, kurs, manba, izoh)
-- Holat o'zgartirish (dropdown orqali)
-- **Sinov darsi sanasi** — SINOV_DARSI holatida sana picker (binafsha) paydo bo'ladi; bugungi sana avtomatik o'rnatiladi
-- **Talabaga yozish** — lid talabaga o'tkazilganda:
-  - Telefon tasdiqlanadi
-  - **Guruh tavsiyasi** — lid qiziqgan kursga mos guruhlar avtomatik tavsiya qilinadi (ball tizimi asosida)
-  - Guruh tanlash (ixtiyoriy)
-  - Talaba yaratiladi, lid "YOZILDI" holatiga o'tadi
-
-**Guruh tavsiyasi algoritmi:**
-| Moslik | Ball |
-|--------|------|
-| Kurs nomi to'liq mos | +5 |
-| Qisman mos | +4 |
-| Bitta so'z mos | +2 |
-| Guruh to'lgan (0 joy) | −3 |
-| 1–2 joy qolgan | +1 |
-| 3+ joy bor | +2 |
-
-Top 4 guruh ko'rsatiladi. Kliklab tanlash mumkin.
-
-**Manba turlari:** Instagram, Telegram, Google, Do'st tavsiyasi, Boshqa
+- Funnel statistika kartalari
+- Oy/yil filtri
+- Sinov darsi sanasi + guruh tanlash
+- Talabaga o'tkazish (guruh tavsiyasi algoritmi bilan)
+- Manba: Instagram, Telegram, Google, Do'st tavsiyasi, Boshqa
 
 ---
 
-### 3. Talabalar
+### 4. Talabalar
+
 **Sahifa:** `/dashboard/talabalar`
 
-Barcha faol talabalarni boshqarish.
+- To'lov holati badge (To'langan / Qisman / Qarzdor)
+- Xavf belgilari (🔴 Xavfli / 🟡 Diqqat)
+- Guruhga biriktirish modali
+- Arxivlash
+- **Excel import** (xlsx fayl yuklash)
+- **Excel export** (talabalar ro'yxati)
 
-**Jadval ustunlari:** Ism/familiya · Telefon · Ota-ona tel. · Kurs/guruh · To'lov summasi · To'lov holati
-
-**To'lov holati badge:**
-- 🟢 To'langan — joriy oy to'liq to'langan
-- 🟡 Qisman — qisman to'langan
-- 🔴 Qarzdor — hech qanday to'lov yo'q
-
-**Xavf belgilari** (avtomatik):
-- 🔴 Xavfli — jiddiy e'tibor talab qiladi
-- 🟡 Diqqat — kuzatib borish kerak
-
-**Funksiyalar:**
-- Ism/telefon bo'yicha qidirish
-- Yangi talaba qo'shish (ism, familiya, telefon, ota-ona tel., email, manzil, izoh)
-- Guruhga biriktirish/o'zgartirish
-- Arxivlash (o'chirish o'rniga faolsizlashtirish)
-- Talaba profiliga o'tish
-
----
-
-### 4. Talaba profili
-**Sahifa:** `/dashboard/talabalar/[id]`
-
-Har bir talaba haqida to'liq ma'lumot.
-
-**Profil kartasi:**
-- Ism, familiya, telefon, ota-ona telefoni
-- Email, tug'ilgan kun, manzil, izoh
-- Ota-ona Telegram ulash linki (bot orqali)
-- **Tahrirlash tugmasi** — barcha ma'lumotlarni o'zgartirish modali
-
-**Davomat statistikasi (joriy oy):**
-- Keldi / Kech keldi / Kelmadi / Sababli sonlar
-- Davomat % (progress bar)
-
-**Davomat trend grafigi (Recharts):**
-- So'nggi 12 haftalik davomat foizi (AreaChart)
-- 80% chegarasi (Reference line) — pastga tushsa ogohlantiradi
-- Hover qilib har hafta tafsilotini ko'rish
-
-**To'lovlar tarixi:**
-- Har oylik to'lovlar ro'yxati (sana, summa, tur, kim qabul qildi)
-- To'lov qo'shish modali (summa, oy, yil, tur, izoh)
-
-**Davomat tarixi:**
-- Barcha darslar ro'yxati (sana, mavzu, holat)
+**Talaba profili** (`/dashboard/talabalar/[id]`):
+- To'liq shaxsiy ma'lumot, tahrirlash
+- Guruhlar jadvali
+- Davomat statistikasi + trend grafigi (AreaChart)
+- To'lovlar tarixi
+- Davomat tarixi
+- **O'quvchi kabineti**: login ko'rsatish, nusxa olish, parol yangilash
+- Telegram bot ulash linki
 
 ---
 
 ### 5. Kurslar va Guruhlar
-**Sahifa:** `/dashboard/kurslar`
 
-**Kurs ma'lumotlari:** Nom, tavsif, davomiyligi, narxi, max talabalar soni
+**Sahifalar:** `/dashboard/kurslar` · `/dashboard/guruhlar/[id]`
 
-**Guruh to'lganlik ogohlantirish:**
-- 🟡 Sariq — guruh 80%+ to'lgan
-- 🔴 Qizil — guruh to'lgan (100%)
-- Kurs sarlavhasida ham umumiy to'lgan/yaqin guruhlar ko'rsatiladi
-
-**Guruh sahifasi** (`/dashboard/guruhlar/[id]`):
-- Guruh ma'lumotlari (kurs, o'qituvchi, xona, kunlar, vaqt)
-- Guruh talabalari ro'yxati
-- Davomat belgilash
-
-**Xona vaqt konflikti tekshiruvi:**
-Yangi guruh ochilganda yoki tahrirlanganda — xuddi shu xona, xuddi shu vaqt va ustma-ust kunlarda boshqa guruh bo'lsa, **409 xato** qaytaradi va qaysi guruh bilan to'qnashgani ko'rsatiladi.
+- Guruh to'lganlik ogohlantirish (🟡 80%+ · 🔴 100%)
+- Xona vaqt konflikti tekshiruvi (409 xato + qaysi guruh bilan to'qnashgani)
+- Guruhga talaba qo'shish/chiqarish
+- Dars jadvali
 
 ---
 
 ### 6. Davomat
+
 **Sahifa:** `/dashboard/davomat`
 
-**Rol bo'yicha:**
-- **Admin/Resepshn** — barcha faol guruhlar ko'rinadi
-- **O'qituvchi** — faqat o'z guruhlari ko'rinadi
-
-**Ishlash tartibi:**
-1. Guruhni tanlash
-2. Dars sanasini kiritish (yoki mavjud darsni tanlash)
-3. Har bir talaba uchun holat belgilash: Keldi / Kech keldi / Kelmadi / Sababli
-
-**Telegram xabarnoma:**
-- Talaba Kelmadi → ota-onaga Telegram xabari avtomatik yuboriladi
-- Talaba Kech keldi → ota-onaga xabar yuboriladi
+- Admin/Resepshn: barcha guruhlar · O'qituvchi: faqat o'z guruhlari
+- Holat: Keldi / Kech keldi / Kelmadi / Sababli
+- Ball kiritish (1–10)
+- Mavjud darsni qayta ochib tahrirlash imkoniyati
+- **Telegram avtoxabar:** Kelmadi/Kech keldi → ota-onaga zudlik bilan xabar
 
 ---
 
 ### 7. To'lovlar
+
 **Sahifa:** `/dashboard/tolovlar`
 
-Barcha to'lovlar ro'yxati + oy/yil filtri.
-
-**To'lov turlari:** Naqd, Karta, Click, Payme
-
-**Funksiyalar:**
-- Talaba bo'yicha qidirish
-- Yangi to'lov qo'shish
-- To'lov tarixi
+- Oy/yil filtri
+- **Guruh bo'yicha filter** *(yangi)*
+- To'lov turlari: Naqd, Karta, Click, Payme
+- **Qayta to'lov ogohlantirishi** *(yangi)* — bir oy uchun 2-to'lov qo'shilganda tasdiqlash so'raladi
+- Excel export
+- To'lov o'chirish
 
 ---
 
-### 8. Qarzdorlar jadvali
+### 8. Qarzdorlar
+
 **Sahifa:** `/dashboard/qarzdorlar`
 
-Joriy oy to'lovini to'lamagan talabalar ro'yxati.
-
-**Statistika:**
-- Jami qarzdorlar soni
-- Ularning umumiy qarzi (so'm)
-- Telegram bor/yo'q soni
-
-**Funksiyalar:**
-- Checkbox orqali birdan ko'p talaba tanlash
-- **Telegram xabar yuborish** — tanlangan barcha qarzdorlarning ota-onalariga bir tugma bilan Telegram xabari
-- Alohida 📨 tugma — bitta talabaga yuborish
-- To'lov eslatma matni avtomatik formatlangan (ism, guruh nomi, qarz miqdori)
+- Joriy oy to'lovini to'lamagan talabalar
+- Telegram bor/yo'q ko'rsatkich
+- Tanlangan barcha qarzdorlarga bulk Telegram xabar
+- Alohida xabar yuborish
 
 ---
 
-### 9. O'qituvchilar
-**Sahifa:** `/dashboard/oqituvchilar`
+### 9. O'qituvchilar va Ish haqi
 
-**Ma'lumotlar:** Ism, email, telefon, mutaxassislik, ish haqi turi
+**Sahifalar:** `/dashboard/oqituvchilar` · `/dashboard/oqituvchilar/ish-haqi` · `/dashboard/oqituvchilar/samaradorlik`
 
 **Ish haqi turlari:**
-| Tur | Tushuntirish |
-|-----|-------------|
-| FOIZ | Guruh tushimining foizi |
-| SOATLIK | Dars soati narxi × dars soatlari |
+| Tur | Hisoblash |
+|-----|-----------|
+| FOIZ | Guruh tushimidan % |
+| SOATLIK | Dars soati × narxi |
 | OYLIK | Belgilangan oylik |
 
-**Oy/yil filtri** — qaysi oy uchun hisob-kitob ko'rsatiladi
-
-**Funksiyalar:**
-- Ish haqi hisoblangan summani ko'rish
-- To'lash (modal orqali summa tasdiqlanadi)
-- Tahrirlash (telefon, mutaxassislik, ish haqi turi)
-- Guruhlarini ko'rish modali
-
-**Samaradorlik hisoboti** (`/dashboard/oqituvchilar/samaradorlik`):
-
-| Ko'rsatkich | Hisoblash usuli |
-|-------------|----------------|
-| Davomat % | So'nggi 30 kungi davomat yozuvlari (keldi / jami) |
-| To'lov foizi | Joriy oy to'liq to'lagan talabalar / jami talabalar |
-| Samaradorlik balli | Davomat×0.6 + To'lov×0.4 |
-
-- 🥇🥈🥉 reyting tartibi
-- Qatorni bosib har bir guruh bo'yicha batafsil ko'rish
+**Samaradorlik hisoboti:**
+- Davomat % (so'nggi 30 kun)
+- To'lov foizi (guruh bo'yicha)
+- Samaradorlik ball (davomat×0.6 + to'lov×0.4)
+- 🥇🥈🥉 reyting
 
 ---
 
 ### 10. O'qituvchi shaxsiy kabineti
+
 **Sahifa:** `/dashboard/oqituvchi`
 
-Faqat OQITUVCHI roli uchun.
-
-**Ko'rsatkichlar:**
-- Mening guruhlarim soni
-- Jami o'quvchilar (barcha guruhlari bo'yicha)
-- Oxirgi oy ish haqi va holati
-
-**Bugungi darslar** — o'sha kuni dars bor guruhlar (tugmachalar ko'rinishida)
-
-**Tablar:**
-- **Guruhlarim** — guruhlar jadvali, har birida "Batafsil" link
-- **Ish haqi tarixi** — oxirgi 12 oy ish haqilari
+- Guruhlar soni, jami o'quvchilar
+- Ish haqi (so'nggi va joriy oy)
+- Bugungi darslar
+- Guruhlar jadvali
+- Ish haqi tarixi (12 oy)
 
 ---
 
-### 11. Xavf tahlili (Churn Prediction)
-**Sahifa:** Dashboard widget + `/dashboard/talabalar` belgisi
+### 11. Moliya (Xarajatlar + Hisobot)
 
-Har bir faol talaba uchun chiqib ketish xavfi avtomatik baholanadi.
+**Sahifalar:** `/dashboard/xarajatlar` · `/hisobotlar`
 
-**Baholash tizimi:**
+**Xarajat turlari:** Ijara, Kommunal, Reklama, Maosh, Jihozlar, Boshqa
+
+**Hisobot sahifasida P&L:**
+- Daromad (to'lovlar jami)
+- Xarajat (xarajatlar jami)
+- **Foyda = Daromad − Xarajat**
+- Xarajat turlari bo'yicha taqsimot jadvali
+
+---
+
+### 12. Xavf tahlili (Churn Prediction)
+
+**Har kuni 20:00 da avtomatik ishlaydi**
 
 | Mezon | Ball |
 |-------|------|
@@ -267,141 +233,132 @@ Har bir faol talaba uchun chiqib ketish xavfi avtomatik baholanadi.
 | Joriy oy to'lovi yo'q | −2 |
 | Davomat trenddagi pasayish > 20% | −1 |
 
-**Daraja:**
-- 🔴 **XAVFLI** — ball ≤ −3
-- 🟡 **DIQQAT** — ball −1 yoki −2
-
-**Ko'rish joylari:**
-1. Dashboard — qizil blokda xavfli talabalar ro'yxati
-2. Talabalar jadvalida — ism yonida rangli belgi
-3. Kun oxiri Telegram — adminga va ota-onalarga xabar (cron)
+- 🔴 XAVFLI (ball ≤ −3) — adminga + ota-onaga Telegram xabar
+- 🟡 DIQQAT (ball −1, −2) — dashboard da belgi
 
 ---
 
-### 12. Telegram Bot
+### 13. O'quvchi portali
+
+**Sahifalar:** `/portal` · `/portal/davomat` · `/portal/jadval` · `/portal/tolovlar` · `/portal/profil`
+
+- Talaba o'z telefon raqami va parol bilan kiradi
+- **Parol ko'rsatish/yashirish tugmasi** (ko'z ikonka) *(yangi)*
+- Davomat tarixi (oyma-oy)
+- To'lovlar tarixi
+- Dars jadvali
+- Profil tahrirlash va parol o'zgartirish
+
+**Admin tomonidan portal boshqarish:**
+- Talaba profilidan login ko'rish + nusxa olish tugmasi *(yangi)*
+- Parol yaratish yoki yangilash
+
+---
+
+### 14. Telegram Bot va Cron
+
 **Bot:** `@Eeduaicrm_bot`
 
-**Ota-onani ulash:**
-1. Admin talaba profilidan "Telegram ulash" linkini nusxalaydi
-2. Ota-ona botga `/start [talabaId]` buyrug'ini bosadi
-3. Bot ota-onaning Telegram ID sini bazaga saqlaydi
-
-**Bot buyruqlari:**
-| Buyruq | Natija |
-|--------|--------|
-| `/start [talabaId]` | Ota-ona ulanadi, farzand ma'lumoti ko'rsatiladi |
-| `/info` | Farzand haqida qisqacha ma'lumot |
-
-**Avtomatik xabarlar:**
-| Holat | Kim oladi | Qachon |
-|-------|-----------|--------|
-| Talaba kelmadi | Ota-ona | Davomat belgilananda |
-| Talaba kech keldi | Ota-ona | Davomat belgilananda |
-| To'lov eslatmasi | Barcha ota-onalar | Har oyning 1-sida (cron) |
-| Xavfli talabalar xulosasi | Admin | Har kuni soat 20:00 (cron) |
+| Hodisa | Vaqt | Xabar |
+|--------|------|-------|
+| Davomat (kelmadi/kech) | Darhol | Ota-onaga xabar |
+| To'lov eslatmasi | Har oyning 1-si, 09:00 | Qarzdor ota-onalarga |
+| Xavf tahlili xulosasi | Har kuni 20:00 | Adminga xulosa + ota-onalarga |
+| Sinov darsi eslatmasi | Har kuni 18:00 | Ertaga sinov darsi bor lidlar |
+| Tug'ilgan kun tabrigi | Har kuni 08:00 | Talaba va ota-onaga tabrik |
 
 ---
 
-### 13. Oylik PDF Hisobot
-**Sahifa:** `/dashboard/hisobotlar`
+### 15. Import / Export
 
-**Oy/yil tanlash** — istalgan oy uchun hisobot ko'rish.
-
-**Ko'rsatkichlar:**
-- Jami tushum (so'm) + to'lovlar soni
-- Yangi talabalar (+) va chiqib ketganlar (−)
-- Lid → Talaba konversiya %
-- Umumiy davomat % (o'sha oy)
-
-**Jadvallar:**
-- To'lov turlari (naqd/karta/click) — progress bar
-- Lid manbasi tahlili — progress bar
-- Top 5 to'lovchi
-- Barcha guruhlar holati (to'lganlik %, oylik tushum)
-
-**PDF chiqarish:** "PDF chiqarish" tugmasi → brauzer print dialog → "Save as PDF"
+- **Excel export:** Talabalar, to'lovlar, davomat hisoboti
+- **Excel import:** Talabalar ro'yxati (xlsx fayl)
+- **PDF hisobot:** Brauzer print orqali (`/hisobotlar`)
 
 ---
 
-### 14. Xonalar
-**Sahifa:** `/dashboard/xonalar`
+### 16. Xonalar va Foydalanuvchilar
 
-O'quv xonalarini boshqarish.
-
-**Ma'lumotlar:** Nom, sig'im (o'rindiq soni), izoh, faol/faol emas
-
-**Vaqt konflikti tekshiruvi** — guruh xonaga biriktirilganda avtomatik tekshiriladi (→ Kurslar moduli)
+- `/dashboard/xonalar` — xona CRUD, sig'im
+- `/dashboard/foydalanuvchilar` — xodim CRUD, rol tayinlash, filialga biriktirish
 
 ---
 
-### 15. Foydalanuvchilar
-**Sahifa:** `/dashboard/foydalanuvchilar`
+## Avtomatik jarayonlar (Vercel Cron)
 
-Tizim foydalanuvchilarini boshqarish (faqat ADMIN).
-
-**Funksiyalar:**
-- Yangi foydalanuvchi qo'shish (ism, email, parol, rol)
-- Rol o'zgartirish
-- O'chirish
-
----
-
-## Avtomatik jarayonlar (Cron)
-
-| Vazifa | Jadval | Nima qiladi |
-|--------|--------|-------------|
-| To'lov eslatmasi | Har oyning 1-si, soat 09:00 | Joriy oy to'lovini to'lamagan barcha talabalarning ota-onasiga Telegram xabari |
-| Xavf tahlili | Har kuni soat 20:00 | Xavfli talabalarni hisoblaydi, adminga xulosa, XAVFLI talabalar ota-onasiga ogohlantirish |
-
----
-
-## API endpointlar (qisqacha)
-
-| Endpoint | Metod | Vazifasi |
-|----------|-------|---------|
-| `/api/lidlar` | GET, POST | Lidlar ro'yxati, yangi lid |
-| `/api/lidlar/[id]` | PATCH, DELETE | Holat o'zgartirish, o'chirish |
-| `/api/lidlar/[id]/yozish` | POST | Lidni talabaga o'tkazish |
-| `/api/lidlar/[id]/guruh-tavsiya` | GET | Lidga mos guruhlar tavsiyasi |
-| `/api/talabalar` | GET, POST | Talabalar, yangi talaba |
-| `/api/talabalar/[id]` | GET, PATCH, DELETE | Profil, tahrirlash, arxivlash |
-| `/api/talabalar/[id]/davomat-trend` | GET | 12 haftalik davomat grafigi |
-| `/api/talabalar/[id]/guruh` | POST | Guruhga biriktirish |
-| `/api/davomat` | GET, POST | Davomat belgilash |
-| `/api/tolovlar` | GET, POST | To'lovlar |
-| `/api/guruhlar` | GET, POST | Guruhlar, yangi guruh (konflikt tekshiruvi) |
-| `/api/guruhlar/[id]` | GET, PATCH, DELETE | Guruh CRUD (konflikt tekshiruvi) |
-| `/api/kurslar` | GET, POST | Kurslar |
-| `/api/oqituvchilar` | GET, POST | O'qituvchilar |
-| `/api/oqituvchilar/samaradorlik` | GET | Samaradorlik hisoboti |
-| `/api/oqituvchi/guruhlar` | GET | O'qituvchining o'z guruhlari |
-| `/api/oqituvchi/ish-haqi` | GET | O'qituvchining ish haqi tarixi |
-| `/api/ish-haqi` | GET, POST | Ish haqi hisob-kitob |
-| `/api/qarzdorlar` | GET | Qarzdorlar ro'yxati |
-| `/api/qarzdorlar/xabar` | POST | Telegram bulk xabar |
-| `/api/xavf-tahlil` | GET | Xavfli talabalar ro'yxati |
-| `/api/hisobotlar/oylik` | GET | Oylik hisobot ma'lumotlari |
-| `/api/xonalar` | GET, POST | Xonalar CRUD |
-| `/api/telegram/webhook` | POST | Telegram bot webhook |
-| `/api/cron/tolov-eslatma` | GET | To'lov eslatmasi cron |
-| `/api/cron/xavf-tahlil` | GET | Xavf tahlili cron |
+| Endpoint | Jadval |
+|----------|--------|
+| `/api/cron/tolov-eslatma` | Har oyning 1-si, 09:00 |
+| `/api/cron/xavf-tahlil` | Har kuni 20:00 |
+| `/api/cron/sinov-eslatma` | Har kuni 18:00 |
+| `/api/cron/tugrilgan-kun` | Har kuni 08:00 |
 
 ---
 
 ## Ma'lumotlar bazasi modellari
 
 ```
-User          — tizim foydalanuvchilari (ADMIN, OQITUVCHI, RECEPTION)
-Oqituvchi     — o'qituvchi profili (ish haqi turi, mutaxassislik)
-Kurs          — kurs (nom, narxi, davomiyligi, max talaba soni)
-Guruh         — guruh (kurs, o'qituvchi, xona, kunlar, vaqt)
-Talaba        — talaba (ism, telefon, ota-ona, Telegram ID)
-TalabaGuruh   — talaba-guruh bog'lanishi (ko'p-ko'p)
-Lid           — potentsial o'quvchi (holat, manba, sinov sanasi)
+Filial        — filial (nom, manzil, telefon)
+User          — xodimlar (DIREKTOR, ADMIN, RECEPTION, OQITUVCHI)
+Oqituvchi     — o'qituvchi profili
+Kurs          — kurs (nom, narxi, davomiyligi)
+Guruh         — guruh (kurs, o'qituvchi, xona, kunlar, vaqt, filial)
+Talaba        — talaba (ism, telefon, login, parolHash, filial)
+TalabaGuruh   — talaba↔guruh bog'lanishi
+Lid           — potentsial o'quvchi (holat, manba, sinov, filial)
 Dars          — bitta dars (guruh, sana, mavzu)
-Davomat       — bitta dars uchun talaba davomati
-Tolov         — to'lov yozuvi (talaba, summa, oy/yil, tur)
-IshHaq        — o'qituvchi ish haqi (oy/yil, summa, to'langanmi)
-Xona          — o'quv xonasi (nom, sig'im)
+Davomat       — dars uchun talaba davomati (holat, baho)
+Tolov         — to'lov (talaba, summa, oy/yil, tur)
+IshHaq        — o'qituvchi ish haqi
+Xarajat       — xarajat (tur, summa, sana, filial)
+Xona          — o'quv xonasi (nom, sig'im, filial)
 Xabar         — SMS/Telegram xabar logi
 ```
+
+---
+
+## Environment variables (`.env`)
+
+```env
+DATABASE_URL=           # Neon PostgreSQL connection string
+NEXTAUTH_SECRET=        # openssl rand -base64 32
+NEXTAUTH_URL=           # https://yourdomain.vercel.app
+TELEGRAM_BOT_TOKEN=     # BotFather dan olingan token
+TELEGRAM_CHAT_ID=       # Admin Telegram chat ID
+CRON_SECRET=            # Cron himoyasi uchun maxfiy kalit
+NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=  # Bot username (@siz_bot)
+```
+
+---
+
+## Deploy (Vercel)
+
+```bash
+# 1. GitHub ga push
+git push origin main
+
+# 2. Vercel dashboard da:
+#    - GitHub repo ulash
+#    - Environment variables kiritish
+#    - Deploy bosish
+
+# 3. DB migration
+npx prisma db push
+
+# 4. Demo ma'lumotlar
+npm run db:seed
+```
+
+**Vercel cron:** `vercel.json` da sozlangan, Pro plan talab qilinadi.
+
+---
+
+## Git tarixi
+
+| Commit | Tavsif |
+|--------|--------|
+| `e4f78c7` | Ko'p filial tizimi + demo seed |
+| `fd1b047` | Backlog va V2 modullar (to'liq) |
+| `032c109` | O'quvchi portal (V2) |
+| `1a03970` | V2.0 rejalari |
+| `6741baf` | Davomat, ish haqi, to'lovlar yaxshilanishi |
