@@ -76,7 +76,7 @@ export default function PortalLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowParol((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-0 top-0 h-full px-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                   tabIndex={-1}
                 >
                   {showParol ? (
@@ -101,7 +101,7 @@ export default function PortalLoginPage() {
 
             <button
               type="submit"
-              disabled={yuklanyapti || login.length < 5 || !parol}
+              disabled={yuklanyapti || !login.trim() || !parol}
               className="w-full py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {yuklanyapti ? "Kirilmoqda..." : "Kirish"}
