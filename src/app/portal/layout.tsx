@@ -22,8 +22,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-56 min-h-screen bg-white border-r border-gray-100 flex flex-col">
+
+      {/* ── Desktop sidebar ─────────────────────────────────── */}
+      <aside className="hidden lg:flex w-56 min-h-screen bg-white border-r border-gray-100 flex-col">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
@@ -86,8 +87,53 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </div>
       </aside>
 
-      {/* Content */}
-      <main className="flex-1 overflow-auto">{children}</main>
+      {/* ── Content ─────────────────────────────────────────── */}
+      <main className="flex-1 overflow-auto pb-20 lg:pb-0">
+        {/* Mobile topbar */}
+        <div className="lg:hidden sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">E</span>
+            </div>
+            <span className="text-sm font-semibold text-gray-900">EduCRM</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-xs font-medium text-brand-700">
+              {initials}
+            </div>
+          </div>
+        </div>
+
+        {children}
+      </main>
+
+      {/* ── Mobile bottom navigation ─────────────────────────── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100">
+        <div className="flex items-stretch">
+          {navItems.map((item) => {
+            const isActive = item.href === "/portal"
+              ? pathname === "/portal"
+              : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors",
+                  isActive ? "text-brand-600" : "text-gray-400"
+                )}
+              >
+                <span className="text-lg leading-none">{item.icon}</span>
+                <span className="text-[10px] font-medium leading-tight">{item.label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 w-8 h-0.5 bg-brand-600 rounded-t-full" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
     </div>
   );
 }

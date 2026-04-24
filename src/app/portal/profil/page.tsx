@@ -55,13 +55,13 @@ export default function PortalProfilPage() {
   };
 
   if (!profil) {
-    return <div className="p-6 text-center text-gray-400 py-20">Yuklanmoqda...</div>;
+    return <div className="p-4 lg:p-6 text-center text-gray-400 py-20">Yuklanmoqda...</div>;
   }
 
   const initials = `${profil.ism[0]}${profil.familiya[0]}`.toUpperCase();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
       <h1 className="text-xl font-semibold text-gray-900">Profil</h1>
 
       {/* Avatar + ism */}

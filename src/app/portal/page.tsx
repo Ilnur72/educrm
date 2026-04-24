@@ -83,24 +83,24 @@ export default function PortalDashboard() {
   const name = session?.user?.name ?? me ? `${me?.ism} ${me?.familiya}` : "";
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
       {/* Xush kelibsiz */}
-      <div className="bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-6 text-white">
-        <p className="text-brand-100 text-sm mb-1">Xush kelibsiz!</p>
-        <h1 className="text-2xl font-bold mb-4">{name}</h1>
+      <div className="bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-5 text-white">
+        <p className="text-brand-100 text-sm mb-0.5">Xush kelibsiz!</p>
+        <h1 className="text-xl lg:text-2xl font-bold mb-3">{name}</h1>
         {faolGuruh && (
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="bg-white/10 rounded-lg px-3 py-1.5">
-              <span className="text-brand-200">Kurs: </span>
+          <div className="flex flex-col gap-1.5 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-brand-200 text-xs">Kurs</span>
               <span className="font-medium">{faolGuruh.kurs.nom}</span>
             </div>
-            <div className="bg-white/10 rounded-lg px-3 py-1.5">
-              <span className="text-brand-200">Guruh: </span>
+            <div className="flex items-center gap-2">
+              <span className="text-brand-200 text-xs">Guruh</span>
               <span className="font-medium">{faolGuruh.nom}</span>
             </div>
             {faolGuruh.oqituvchi && (
-              <div className="bg-white/10 rounded-lg px-3 py-1.5">
-                <span className="text-brand-200">O'qituvchi: </span>
+              <div className="flex items-center gap-2">
+                <span className="text-brand-200 text-xs">O'qituvchi</span>
                 <span className="font-medium">{faolGuruh.oqituvchi.user.name}</span>
               </div>
             )}
@@ -109,10 +109,10 @@ export default function PortalDashboard() {
       </div>
 
       {/* Stat kartalar */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <p className="text-xs text-gray-400 mb-1">Bu oylik davomat</p>
-          <p className={`text-2xl font-bold ${
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4">
+          <p className="text-[11px] text-gray-400 mb-1 leading-tight">Bu oylik davomat</p>
+          <p className={`text-xl lg:text-2xl font-bold ${
             davomiylik === null ? "text-gray-400"
             : davomiylik >= 80 ? "text-green-600"
             : davomiylik >= 60 ? "text-amber-500"
@@ -120,61 +120,53 @@ export default function PortalDashboard() {
           }`}>
             {davomiylik !== null ? `${davomiylik}%` : "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            {davomat?.keldi ?? 0} keldi / {davomat?.kelmadi ?? 0} kelmadi
+          <p className="text-[10px] text-gray-400 mt-1">
+            {davomat?.keldi ?? 0}/{(davomat?.keldi ?? 0) + (davomat?.kelmadi ?? 0)} dars
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <p className="text-xs text-gray-400 mb-1">O'rtacha ball</p>
-          <p className={`text-2xl font-bold ${
-            davomat?.ortachaBaho === null || davomat?.ortachaBaho === undefined
-              ? "text-gray-400"
-              : davomat.ortachaBaho >= 80 ? "text-green-600"
-              : davomat.ortachaBaho >= 60 ? "text-amber-500"
-              : "text-red-500"
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4">
+          <p className="text-[11px] text-gray-400 mb-1 leading-tight">O'rtacha ball</p>
+          <p className={`text-xl lg:text-2xl font-bold ${
+            davomat?.ortachaBaho == null ? "text-gray-400"
+            : davomat.ortachaBaho >= 80 ? "text-green-600"
+            : davomat.ortachaBaho >= 60 ? "text-amber-500"
+            : "text-red-500"
           }`}>
-            {davomat?.ortachaBaho !== null && davomat?.ortachaBaho !== undefined
-              ? davomat.ortachaBaho
-              : "—"}
+            {davomat?.ortachaBaho ?? "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">100 ball tizimida</p>
+          <p className="text-[10px] text-gray-400 mt-1">100 ball tizim</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <p className="text-xs text-gray-400 mb-1">To'lov holati</p>
-          <p className={`text-2xl font-bold ${tolovHolat.ok ? "text-green-600" : "text-red-500"}`}>
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4">
+          <p className="text-[11px] text-gray-400 mb-1 leading-tight">To'lov holati</p>
+          <p className={`text-xl lg:text-2xl font-bold ${tolovHolat.ok ? "text-green-600" : "text-red-500"}`}>
             {tolovHolat.ok ? "✓" : "✗"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">{tolovHolat.label}</p>
+          <p className="text-[10px] text-gray-400 mt-1">{tolovHolat.label}</p>
         </div>
       </div>
 
-      {/* Dars ma'lumoti */}
+      {/* Bugungi dars */}
       {faolGuruh && (
-        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
-          <h2 className="font-medium text-gray-900">Dars ma'lumoti</h2>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2 text-gray-600">
-              <span className="text-gray-400">Vaqt:</span>
-              <span className="font-medium">{faolGuruh.vaqt}</span>
+        <div className={`rounded-xl border p-4 ${
+          bugunDarsBor ? "bg-green-50 border-green-200" : "bg-white border-gray-100"
+        }`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-400 mb-0.5">Bugungi dars</p>
+              {bugunDarsBor ? (
+                <p className="font-semibold text-green-700">Dars bor — {faolGuruh.vaqt}</p>
+              ) : (
+                <p className="font-medium text-gray-600">
+                  Bugun dars yo'q
+                  {keyingiKun && <span className="text-gray-400 font-normal"> · Keyingi: {keyingiKun}</span>}
+                </p>
+              )}
             </div>
-            {faolGuruh.xona && (
-              <div className="flex items-center gap-2 text-gray-600">
-                <span className="text-gray-400">Xona:</span>
-                <span className="font-medium">{faolGuruh.xona}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2 text-gray-600">
-              <span className="text-gray-400">Kunlar:</span>
-              <span className="font-medium">{faolGuruh.kunlar.join(", ")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-400">Bugun:</span>
-              {bugunDarsBor
-                ? <span className="text-green-600 font-medium">Dars bor — {faolGuruh.vaqt}</span>
-                : <span className="text-gray-500">Dars yo'q {keyingiKun ? `(keyingi: ${keyingiKun})` : ""}</span>
-              }
+            <div className="text-right text-sm text-gray-500">
+              {faolGuruh.xona && <p className="text-xs">Xona: <span className="font-medium">{faolGuruh.xona}</span></p>}
+              <p className="text-xs text-gray-400">{faolGuruh.kunlar.join(", ")}</p>
             </div>
           </div>
         </div>
@@ -182,38 +174,22 @@ export default function PortalDashboard() {
 
       {/* Tezkor havolalar */}
       <div className="grid grid-cols-2 gap-3">
-        <Link
-          href="/portal/davomat"
-          className="bg-white rounded-xl border border-gray-100 p-4 hover:border-brand-200 hover:bg-brand-50 transition-colors group"
-        >
-          <div className="text-2xl mb-2">◉</div>
-          <p className="font-medium text-gray-900 group-hover:text-brand-700">Davomat va baholar</p>
-          <p className="text-xs text-gray-400 mt-0.5">Oylik davomat hisoboti</p>
-        </Link>
-        <Link
-          href="/portal/tolovlar"
-          className="bg-white rounded-xl border border-gray-100 p-4 hover:border-brand-200 hover:bg-brand-50 transition-colors group"
-        >
-          <div className="text-2xl mb-2">◈</div>
-          <p className="font-medium text-gray-900 group-hover:text-brand-700">To'lovlar</p>
-          <p className="text-xs text-gray-400 mt-0.5">To'lovlar tarixi</p>
-        </Link>
-        <Link
-          href="/portal/jadval"
-          className="bg-white rounded-xl border border-gray-100 p-4 hover:border-brand-200 hover:bg-brand-50 transition-colors group"
-        >
-          <div className="text-2xl mb-2">▣</div>
-          <p className="font-medium text-gray-900 group-hover:text-brand-700">Dars jadvali</p>
-          <p className="text-xs text-gray-400 mt-0.5">Haftalik jadval</p>
-        </Link>
-        <Link
-          href="/portal/profil"
-          className="bg-white rounded-xl border border-gray-100 p-4 hover:border-brand-200 hover:bg-brand-50 transition-colors group"
-        >
-          <div className="text-2xl mb-2">◍</div>
-          <p className="font-medium text-gray-900 group-hover:text-brand-700">Profil</p>
-          <p className="text-xs text-gray-400 mt-0.5">Ma'lumotlar va parol</p>
-        </Link>
+        {[
+          { href: "/portal/davomat",  icon: "◉", label: "Davomat",      sub: "Oylik hisobot" },
+          { href: "/portal/tolovlar", icon: "◈", label: "To'lovlar",    sub: "To'lovlar tarixi" },
+          { href: "/portal/jadval",   icon: "▣", label: "Dars jadvali", sub: "Haftalik jadval" },
+          { href: "/portal/profil",   icon: "◍", label: "Profil",       sub: "Ma'lumotlar" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="bg-white rounded-xl border border-gray-100 p-4 active:bg-gray-50 transition-colors"
+          >
+            <div className="text-2xl mb-2">{item.icon}</div>
+            <p className="font-medium text-gray-900 text-sm">{item.label}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{item.sub}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );

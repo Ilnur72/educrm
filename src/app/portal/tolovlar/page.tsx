@@ -41,11 +41,11 @@ export default function PortalTolovlarPage() {
   const oylar = Array.from(oylarMap.entries()).sort((a, b) => b[0].localeCompare(a[0]));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
       <h1 className="text-xl font-semibold text-gray-900">To'lovlar tarixi</h1>
 
       {/* Bu oy holati */}
-      <div className={`rounded-xl border p-5 ${
+      <div className={`rounded-xl border p-4 ${
         oyTolov ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
       }`}>
         <div className="flex items-center justify-between">
@@ -53,18 +53,18 @@ export default function PortalTolovlarPage() {
             <p className="text-sm font-medium text-gray-700">
               {oyNomi(hozir.getMonth() + 1)} {hozir.getFullYear()}
             </p>
-            <p className={`text-2xl font-bold mt-1 ${oyTolov ? "text-green-700" : "text-red-600"}`}>
+            <p className={`text-xl lg:text-2xl font-bold mt-1 ${oyTolov ? "text-green-700" : "text-red-600"}`}>
               {oyTolov ? `${formatSum(oyTolov.summa)} to'langan` : "To'lanmagan"}
             </p>
           </div>
-          <div className={`text-4xl ${oyTolov ? "text-green-500" : "text-red-400"}`}>
+          <div className={`text-3xl lg:text-4xl ${oyTolov ? "text-green-500" : "text-red-400"}`}>
             {oyTolov ? "✓" : "✗"}
           </div>
         </div>
       </div>
 
       {/* Statistika */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
           <p className="text-2xl font-bold text-gray-900">{tolovlar.length}</p>
           <p className="text-xs text-gray-400 mt-1">Jami to'lovlar</p>

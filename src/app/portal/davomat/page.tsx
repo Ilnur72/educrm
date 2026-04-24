@@ -70,14 +70,14 @@ export default function PortalDavomatPage() {
     : null;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-gray-900">Davomat va baholar</h1>
         <div className="flex items-center gap-2">
           <select
             value={oy}
             onChange={(e) => setOy(parseInt(e.target.value))}
-            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="flex-1 sm:flex-none px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{oyNomi(i + 1)}</option>
@@ -94,9 +94,9 @@ export default function PortalDavomatPage() {
       </div>
 
       {/* Statistika */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
-          <p className={`text-3xl font-bold ${
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4 text-center">
+          <p className={`text-2xl lg:text-3xl font-bold ${
             davomiylik === null ? "text-gray-400"
             : davomiylik >= 80 ? "text-green-600"
             : davomiylik >= 60 ? "text-amber-500"
@@ -104,16 +104,16 @@ export default function PortalDavomatPage() {
           }`}>
             {davomiylik !== null ? `${davomiylik}%` : "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Davomiylik</p>
+          <p className="text-[10px] lg:text-xs text-gray-400 mt-1">Davomiylik</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
-          <p className="text-3xl font-bold text-gray-900">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4 text-center">
+          <p className="text-xl lg:text-3xl font-bold text-gray-900">
             {data ? `${data.keldi}/${data.sanalar.length}` : "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Keldi / Jami dars</p>
+          <p className="text-[10px] lg:text-xs text-gray-400 mt-1">Keldi / Jami</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
-          <p className={`text-3xl font-bold ${
+        <div className="bg-white rounded-xl border border-gray-100 p-3 lg:p-4 text-center">
+          <p className={`text-2xl lg:text-3xl font-bold ${
             !data?.ortachaBaho ? "text-gray-400"
             : data.ortachaBaho >= 80 ? "text-green-600"
             : data.ortachaBaho >= 60 ? "text-amber-500"
@@ -121,7 +121,7 @@ export default function PortalDavomatPage() {
           }`}>
             {data?.ortachaBaho ?? "—"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">O'rtacha ball</p>
+          <p className="text-[10px] lg:text-xs text-gray-400 mt-1">O'rtacha ball</p>
         </div>
       </div>
 
@@ -167,7 +167,7 @@ export default function PortalDavomatPage() {
       </div>
 
       {/* Izoh */}
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500">
         <div className="flex items-center gap-1.5">
           <div className="w-5 h-5 rounded bg-green-400"></div> Keldi (K)
         </div>
