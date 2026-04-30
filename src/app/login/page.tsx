@@ -105,8 +105,9 @@ function LoginForm() {
           <p className="text-xs text-gray-400 font-medium mb-2">Test loginlar:</p>
           <div className="space-y-1.5">
             {[
-              { email: "admin@educrm.uz",  parol: "admin123",      rol: "Admin"      },
-              { email: "kamola@educrm.uz", parol: "oqituvchi123",  rol: "O'qituvchi" },
+              { email: "direktor@educrm.uz",     parol: "direktor123",   rol: "Direktor"   },
+              { email: "admin.ch@educrm.uz",     parol: "admin123",      rol: "Admin"      },
+              { email: "teacher1.ch@educrm.uz",  parol: "oqituvchi123",  rol: "O'qituvchi" },
             ].map((h) => (
               <button
                 key={h.email}
