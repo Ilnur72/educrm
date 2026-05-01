@@ -2,10 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default brand rangi: ko'k-binafsha (#534AB7) */
+/* layout.tsx da NEXT_PUBLIC_BRAND_COLOR orqali override qilinadi  */
 :root {
-  --brand: #534AB7;
-  --brand-light: #EEEDFE;
-  --brand-dark: #3C3489;
+  --brand-50:  238 237 254;
+  --brand-100: 206 203 246;
+  --brand-200: 174 169 238;
+  --brand-400: 127 119 221;
+  --brand-600: 83  74  183;
+  --brand-700: 71  63  157;
+  --brand-800: 59  53  131;
+  --brand-900: 43  38   95;
 }
 
 * { box-sizing: border-box; }

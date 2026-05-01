@@ -6,12 +6,14 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#EEEDFE",
-          100: "#CECBF6",
-          400: "#7F77DD",
-          600: "#534AB7",
-          800: "#3C3489",
-          900: "#26215C",
+          50:  "rgb(var(--brand-50)  / <alpha-value>)",
+          100: "rgb(var(--brand-100) / <alpha-value>)",
+          200: "rgb(var(--brand-200) / <alpha-value>)",
+          400: "rgb(var(--brand-400) / <alpha-value>)",
+          600: "rgb(var(--brand-600) / <alpha-value>)",
+          700: "rgb(var(--brand-700) / <alpha-value>)",
+          800: "rgb(var(--brand-800) / <alpha-value>)",
+          900: "rgb(var(--brand-900) / <alpha-value>)",
         },
       },
       fontFamily: {

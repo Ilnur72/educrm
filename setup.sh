@@ -18,6 +18,8 @@ read -p "🗄️  PostgreSQL DATABASE_URL: " DATABASE_URL
 read -p "🤖 Telegram Bot Token: " BOT_TOKEN
 read -p "💬 Telegram Admin Chat ID: " CHAT_ID
 read -p "🤖 Telegram Bot Username (@ siz): " BOT_USERNAME
+read -p "🎨 Asosiy rang HEX (default #534AB7 — bo'sh qoldiring): " BRAND_COLOR
+BRAND_COLOR="${BRAND_COLOR:-#534AB7}"
 
 # ─── NEXTAUTH_SECRET generatsiya ──────────────────────────────
 SECRET=$(openssl rand -base64 32)
@@ -31,6 +33,7 @@ NEXTAUTH_URL="${SERVER_URL}"
 
 NEXT_PUBLIC_APP_NAME="${APP_NAME}"
 NEXT_PUBLIC_APP_TAGLINE="O'quv markaz boshqaruv tizimi"
+NEXT_PUBLIC_BRAND_COLOR="${BRAND_COLOR}"
 
 SMS_LOGIN="your-eskiz-login"
 SMS_PASSWORD="your-eskiz-password"
