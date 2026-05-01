@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/Card";
 import { Table, Thead, Th, Tbody, Tr, Td } from "@/components/ui/Table";
+import { APP_NAME } from "@/lib/config";
 import { oyNomi, formatSum } from "@/lib/utils";
 
 type GuruhStat = {
@@ -95,7 +96,7 @@ export default function HisobotlarPage() {
       <div className="p-6 space-y-6" id="print-area" ref={printRef}>
         {/* Sarlavha (faqat printda) */}
         <div className="hidden print:block mb-6 border-b pb-4">
-          <h1 className="text-xl font-bold text-gray-900">EduCRM — Oylik hisobot</h1>
+          <h1 className="text-xl font-bold text-gray-900">{APP_NAME} — Oylik hisobot</h1>
           <p className="text-sm text-gray-500 mt-1">
             {oyNomi(oy)} {yil} · Chiqarildi: {new Date().toLocaleDateString("uz-UZ")}
           </p>

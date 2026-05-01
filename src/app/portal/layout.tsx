@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/lib/config";
 
 const navItems = [
   { href: "/portal",          label: "Bosh sahifa", icon: "▦" },
@@ -32,7 +33,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               <span className="text-white text-xs font-bold">E</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900">EduCRM</p>
+              <p className="text-sm font-semibold text-gray-900">{APP_NAME}</p>
               <p className="text-xs text-gray-400">O'quvchi kabineti</p>
             </div>
           </div>
@@ -95,7 +96,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
               <span className="text-white text-xs font-bold">E</span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">EduCRM</span>
+            <span className="text-sm font-semibold text-gray-900">{APP_NAME}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-xs font-medium text-brand-700">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { APP_NAME } from "@/lib/config";
 
 type AppRole = "DIREKTOR" | "ADMIN" | "OQITUVCHI" | "RECEPTION";
 
@@ -75,7 +76,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             <span className="text-white text-xs font-bold">E</span>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">EduCRM</p>
+            <p className="text-sm font-semibold text-gray-900">{APP_NAME}</p>
             <p className="text-xs text-gray-400">O'quv markaz</p>
           </div>
         </div>

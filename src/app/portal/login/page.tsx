@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { APP_NAME } from "@/lib/config";
 
 export default function PortalLoginPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function PortalLoginPage() {
           <div className="w-14 h-14 rounded-2xl bg-brand-600 flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl font-bold">E</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">EduCRM</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{APP_NAME}</h1>
           <p className="text-sm text-gray-500 mt-1">O'quvchi kabineti</p>
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 import { Suspense, useState, FormEvent } from "react";
+import { APP_NAME } from "@/lib/config";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -41,7 +42,7 @@ function LoginForm() {
           <div className="w-12 h-12 rounded-2xl bg-brand-600 flex items-center justify-center mb-3">
             <span className="text-white text-xl font-bold">E</span>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">EduCRM</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{APP_NAME}</h1>
           <p className="text-sm text-gray-400 mt-0.5">
             O'quv markaz tizimiga kiring
           </p>
@@ -101,27 +102,6 @@ function LoginForm() {
           </form>
         </div>
 
-        <div className="mt-6 p-4 bg-white rounded-xl border border-dashed border-gray-200">
-          <p className="text-xs text-gray-400 font-medium mb-2">Test loginlar:</p>
-          <div className="space-y-1.5">
-            {[
-              { email: "direktor@educrm.uz",     parol: "direktor123",   rol: "Direktor"   },
-              { email: "admin.ch@educrm.uz",     parol: "admin123",      rol: "Admin"      },
-              { email: "teacher1.ch@educrm.uz",  parol: "oqituvchi123",  rol: "O'qituvchi" },
-            ].map((h) => (
-              <button
-                key={h.email}
-                onClick={() => { setEmail(h.email); setParol(h.parol); setXato(""); }}
-                className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group"
-              >
-                <span className="text-xs text-gray-500 group-hover:text-gray-700">
-                  <span className="font-medium text-gray-700">{h.rol}</span>
-                  {" · "}{h.email}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
